@@ -169,11 +169,21 @@ class Mongo_ModelBase
      */
     protected static function connect ()
     {
+	if(class_exists('Zend_Registry')) {
         $options = Zend_Registry::get('config')->mongodb;
+		} else {
+			$options = new stdclass();
+			$options->username='root';
+			$options->password='root';
+$options->hostname='localhost';
+$options->port='27017';
+$options->databasename='depzp4fztgs';
+
+		}
         $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, 
         $options->password, $options->hostname, $options->port, 
         $options->databasename);
-        $mongoOptions = array("persist" => "x",);
+		$mongoOptions = array("persist" => "x",);
         $connection = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
         //If collection name isn't already set in the model
