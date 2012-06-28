@@ -4,8 +4,7 @@
  * @group Mongo
  * 
  */
-
-    require_once 'Mongo/ModelBase.php';
+require_once 'Mongo/ModelBase.php';
 
 class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase {
 
@@ -120,6 +119,17 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($array, $mongo->getDocument());
     }
 
+    public function testSetDocument() {
+        $mongo = new Mongo_ModelBase();
+        $this->assertFalse($mongo->setDocument());
+
+        $array = array('destdoc' => get_called_class(),
+            'somevalue' => 'a122');
+        $mongo = new Mongo_ModelBase();
+        $mongo->setDocument($array);
+        $this->assertEquals($array, $mongo->getDocument());
+    }
+
     public function testDotNotation() {
         $array = array('destdoc' => get_called_class()
         );
@@ -130,6 +140,15 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals($array, $mongo->getDocument());
 
         $this->assertEquals('Dotnotation', $mongo->{'a.b.c'});
+
+
+        $method = new ReflectionMethod(
+                        'Mongo_ModelBase', '_getDotNotation'
+        );
+
+        $method->setAccessible(TRUE);
+
+        $this->assertNull($method->invoke(new Mongo_ModelBase,'a.b.c',null));
     }
 
     public function testBatchInsert() {
@@ -261,6 +280,30 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase {
         $mongo = new Mongo_ModelBase($array);
 
         $this->assertEquals('Mongo_modelbaseObject ID:' . $array['_id'], $mongo->__toString());
+    }
+
+    public function testSet() {
+        $array = array('sss' => 'asds', '_id' => new MongoId());
+
+        $mongo = new Mongo_ModelBase($array);
+        $mongo->test = "someValue";
+        $this->assertEquals("someValue", $mongo->test);
+
+        $this->assertTrue($mongo->__isset('test'));
+
+        $mongo->test = null;
+        $this->assertNull($mongo->test);
+        $this->assertFalse($mongo->__isset('test'));
+    }
+
+    public function testUnSet() {
+        $array = array('sss' => 'asds', '_id' => new MongoId());
+
+        $mongo = new Mongo_ModelBase($array);
+
+        $this->assertTrue($mongo->__isset('sss'));
+        $mongo->__unset('sss');
+        $this->assertFalse($mongo->__isset('sss'));
     }
 
 }
