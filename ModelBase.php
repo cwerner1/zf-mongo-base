@@ -1,6 +1,7 @@
 <?php
 
-class Mongo_ModelBase {
+class Mongo_ModelBase
+{
 
     public static $_accentStrings = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
     public static $_noAccentStrings = 'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
@@ -33,7 +34,8 @@ class Mongo_ModelBase {
      * Constructor puts full object in $document variable and assigns $id
      * @param $document
      */
-    public function __construct($document = null) {
+    public function __construct($document = null)
+    {
         if ($document != null && isset($document['_id'])) {
             $this->document = $document;
             $this->id = $this->document['_id'];
@@ -48,7 +50,8 @@ class Mongo_ModelBase {
     /**
      * Return object ID
      */
-    public function __toString() {
+    public function __toString()
+    {
         return ucfirst(static::$_collectionName) . "Object ID:" . $this->id;
     }
 
@@ -56,7 +59,8 @@ class Mongo_ModelBase {
      * Get values like an object
      * @param string $name
      */
-    public function __get($name) {
+    public function __get($name)
+    {
         if ($name == "id" || $name == "_id") {
             return $this->id;
         }
@@ -70,7 +74,8 @@ class Mongo_ModelBase {
      * Returns Document with Id
      * @return array
      */
-    public function getDocument() {
+    public function getDocument()
+    {
         $arr = array();
         if ($this->id !== NULL) {
             $arr = array('_id' => $this->id);
@@ -84,7 +89,8 @@ class Mongo_ModelBase {
      * Sets the Mongo Document without changing the ID
      * @param array $document 
      */
-    public function setDocument($document = null) {
+    public function setDocument($document = null)
+    {
 
         if ($document === null) {
             return false;
@@ -101,7 +107,8 @@ class Mongo_ModelBase {
      * @param string $name
      * @param mixed $val
      */
-    public function __set($name, $val) {
+    public function __set($name, $val)
+    {
         if (false !== strpos($name, '.')) {
             return $this->_setDotNotation($name, $val, $this->document);
         }
@@ -116,7 +123,8 @@ class Mongo_ModelBase {
      * @param string $name
      * @return bool
      */
-    public function __isset($name) {
+    public function __isset($name)
+    {
         return isset($this->document[$name]);
     }
 
@@ -124,7 +132,8 @@ class Mongo_ModelBase {
      * Unset a variable in the object
      * @param $name
      */
-    public function __unset($name) {
+    public function __unset($name)
+    {
         unset($this->document[$name]);
     }
 
@@ -136,7 +145,8 @@ class Mongo_ModelBase {
      * @param string $fields fields with dot notation
      * @param reference $current The current part of the array working in
      */
-    protected function _getDotNotation($fields, &$current) {
+    protected function _getDotNotation($fields, &$current)
+    {
         $i = strpos($fields, '.');
         if ($i !== false) {
             $field = substr($fields, 0, $i);
@@ -159,7 +169,8 @@ class Mongo_ModelBase {
      * @param mixed $value
      * @param reference $current
      */
-    protected function _setDotNotation($fields, $value, &$current) {
+    protected function _setDotNotation($fields, $value, &$current)
+    {
         $i = strpos($fields, '.');
         if ($i !== false) {
             $field = substr($fields, 0, $i);
@@ -180,7 +191,8 @@ class Mongo_ModelBase {
     /**
      * Delete the object
      */
-    public function delete() {
+    public function delete()
+    {
         if ($this->id != null) {
 
             static::$_collection->remove(array("_id" => $this->id));
@@ -192,7 +204,8 @@ class Mongo_ModelBase {
     /**
      * Save the object with all variables that have been set
      */
-    public function save() {
+    public function save()
+    {
 
 
         if ($this->id == null) {
@@ -210,7 +223,8 @@ class Mongo_ModelBase {
      * Do special updates to the object (incrementing, etc...)
      * @param mixed $data
      */
-    public function specialUpdate($modifier, $options) {
+    public function specialUpdate($modifier, $options)
+    {
         return static::update(array("_id" => $this->id), $modifier, $options);
     }
 
@@ -222,16 +236,14 @@ class Mongo_ModelBase {
      * Connect to mongo...
      * @return MongoDb 
      */
-    protected static function connect() {
-
-
-
-
-        if (class_exists('Zend_Registry')) {
-            self::$_mongo = Zend_Registry::get('mongoDb');
+    public static function connect($options = null)
+    {
+        if (self::$_mongo !== null) {
             return self::$_mongo;
-            //$options = Zend_Registry::get('config')->mongodb;
-        } else {
+        }
+       
+
+        if (!is_array($options)) {
             $options = new stdclass();
             $options->username = 'root';
             $options->password = 'root';
@@ -239,23 +251,24 @@ class Mongo_ModelBase {
             $options->port = '27017';
             $options->databasename = 'depzp4fztgs';
         }
+
         $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
         $mongoOptions = array("persist" => "x");
 
-        if (!extension_loaded('mongo')) {
-            throw new Exception('no Mongo class loaded');
-        }
 
         $connection = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
-
-//If collection name isn't already set in the model
     }
-
+    
+    public static function disconnect() 
+    {
+        self::$_mongo=null;
+    }
     /**
      * Setup db connection and init mongo collection
      */
-    public static function init() {
+    public static function init()
+    {
         if (self::$_mongo == null) {
             self::connect();
         }
@@ -279,7 +292,8 @@ class Mongo_ModelBase {
      * Load object by ID
      * @param $_id
      */
-    public static function load($_id) {
+    public static function load($_id)
+    {
         $object = static::findOne(array("_id" => new MongoId($_id)));
         if ($object === null) {
             return false;
@@ -291,14 +305,16 @@ class Mongo_ModelBase {
     /**
      * Find all records in a collection
      */
-    public static function findAll() {
+    public static function findAll()
+    {
         return static::find();
     }
 
     /**
      * Get one record
      */
-    public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null) {
+    public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null)
+    {
         $className = get_called_class();
         $document = static::getCursor($conditionalArray, $fieldsArray, true);
         if ($document == null) {
@@ -315,7 +331,8 @@ class Mongo_ModelBase {
      * @param array $sort
      * @param int $limit
      */
-    public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL) {
+    public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL)
+    {
         $cursor = static::getCursor($conditionalArray, $fieldsArray);
         if ($skip != NULL) {
             $cursor = $cursor->skip($skip);
@@ -328,7 +345,8 @@ class Mongo_ModelBase {
         }
         $className = get_called_class();
         $objectArray = array();
-        foreach ($cursor as $document) {
+        foreach ($cursor as $document)
+        {
             $objectArray[] = new $className($document);
         }
         return $objectArray;
@@ -339,7 +357,8 @@ class Mongo_ModelBase {
      * @param array $conditionalArray
      */
 
-    public static function count($conditionalArray = null) {
+    public static function count($conditionalArray = null)
+    {
         $cursor = static::getCursor($conditionalArray);
         return $cursor->count();
     }
@@ -349,7 +368,8 @@ class Mongo_ModelBase {
      * @param array $conditionalArray
      * @param array $fieldsArray
      */
-    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = FALSE) {
+    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = FALSE)
+    {
         static::init();
         if ($conditionalArray == NULL) {
             $conditionalArray = array();
@@ -373,7 +393,8 @@ class Mongo_ModelBase {
      * for database response...
      * @param bool $fsync
      */
-    public static function insert($data, $safe = false, $fsync = false) {
+    public static function insert($data, $safe = false, $fsync = false)
+    {
         static::init();
         $options = array();
         if ($safe) {
@@ -389,12 +410,14 @@ class Mongo_ModelBase {
      * Do a batch insert into the collection
      * @param array $data
      */
-    public static function batchInsert($data) {
+    public static function batchInsert($data)
+    {
         static::init();
         return static::$_collection->batchInsert($data);
     }
 
-    public static function update($criteria, $update, $options = array()) {
+    public static function update($criteria, $update, $options = array())
+    {
 
         static::init();
         return static::$_collection->update($criteria, $update, $options);
@@ -408,7 +431,8 @@ class Mongo_ModelBase {
      * @param string $text The text.
      * @return string The REGEX text.
      */
-    public static function accentToRegex($text) {
+    public static function accentToRegex($text)
+    {
 
 
 
@@ -421,7 +445,8 @@ class Mongo_ModelBase {
 
         $regex = array();
 
-        foreach ($to as $key => $value) {
+        foreach ($to as $key => $value)
+        {
 
             if (isset($regex[$value])) {
 
@@ -432,12 +457,14 @@ class Mongo_ModelBase {
             }
         }
 
-        foreach ($regex as $rgKey => $rg) {
+        foreach ($regex as $rgKey => $rg)
+        {
 
             $text = preg_replace("/[$rg]/", "_{$rgKey}_", $text);
         }
 
-        foreach ($regex as $rgKey => $rg) {
+        foreach ($regex as $rgKey => $rg)
+        {
 
             $text = preg_replace("/_{$rgKey}_/", "[$rg]", $text);
         }
