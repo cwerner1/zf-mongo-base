@@ -221,7 +221,9 @@ class Mongo_ModelBase
 
     /**
      * Do special updates to the object (incrementing, etc...)
-     * @param mixed $data
+     * @param array $modifier
+     * @param array $options
+     * @return type 
      */
     public function specialUpdate($modifier, $options)
     {
@@ -241,7 +243,7 @@ class Mongo_ModelBase
         if (self::$_mongo !== null) {
             return self::$_mongo;
         }
-       
+
 
         if (!is_array($options)) {
             $options = new stdclass();
@@ -259,11 +261,12 @@ class Mongo_ModelBase
         $connection = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
     }
-    
-    public static function disconnect() 
+
+    public static function disconnect()
     {
-        self::$_mongo=null;
+        self::$_mongo = null;
     }
+
     /**
      * Setup db connection and init mongo collection
      */
@@ -416,6 +419,13 @@ class Mongo_ModelBase
         return static::$_collection->batchInsert($data);
     }
 
+    /**
+     * Updates an entry
+     * @param array $criteria
+     * @param array $update
+     * @param array $options
+     * @return type 
+     */
     public static function update($criteria, $update, $options = array())
     {
 

@@ -350,15 +350,24 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     {
         $mongoModelBase = new Mongo_ModelBase();
         $mongoModelBase->tt = 4;
+        $mongoModelBase->specialfield = 57;
         $mongoDoc = $mongoModelBase->save();
 
         $this->assertTrue($mongoDoc);
         $mongoModelBaseSecond = new Mongo_ModelBase();
         $mongoRet = $mongoModelBaseSecond::findOne(array('tt' => 4));
 
-        $mongoRet->specialUpdate(array('$pop' => array('tt' => 1)), array());
 
-        $this->markTestIncomplete('special Udate');
+        $updateArray = array(
+            '$set' => array('ta' => 1),
+            '$inc' => array('specialfield' => 2)
+        );
+        $mongoRet->specialUpdate($updateArray, array());
+
+
+        $mongoRet = $mongoModelBaseSecond::findOne(array('tt' => 4));
+        $this->assertEquals(1, $mongoRet->ta);
+        $this->assertEquals(59, $mongoRet->specialfield);
     }
 
 }
