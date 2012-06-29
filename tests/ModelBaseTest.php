@@ -14,8 +14,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     {
 
         $testEntrys = Mongo_ModelBase::find();
-        foreach ($testEntrys as $key => $entry)
-        {
+        foreach ($testEntrys as $key => $entry) {
 
             $entry->delete();
         }
@@ -92,8 +91,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $this->assertGreaterThan(0, count($mongoRet));
         $this->assertEquals($mongoRet[0]->test, '3');
 
-        foreach ($mongoRet as $ret)
-        {
+        foreach ($mongoRet as $ret) {
             $ret->delete();
         }
         $mongoRet = $mongoModelBase::findOne(array('test' => '3'));
@@ -175,8 +173,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     public function testBatchInsert()
     {
         $users = array();
-        for ($i = 0; $i < 100; $i++)
-        {
+        for ($i = 0; $i < 100; $i++) {
             $users[] = array('tofind' => 't',
                 'username' => 'user' . $i,
                 'i' => $i);
@@ -191,8 +188,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     public function testFindAll()
     {
         $users = array();
-        for ($i = 0; $i < 43; $i++)
-        {
+        for ($i = 0; $i < 43; $i++) {
             $users[] = array('tofind' => 't',
                 'username' => 'user' . $i,
                 'i' => $i);
@@ -215,8 +211,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     public function testFindSkipAndLimit()
     {
         $users = array();
-        for ($i = 0; $i < 100; $i++)
-        {
+        for ($i = 0; $i < 100; $i++) {
             $users[] = array('tofind' => 't',
                 'username' => 'user' . $i,
                 'i' => $i);

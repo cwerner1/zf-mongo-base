@@ -348,8 +348,7 @@ class Mongo_ModelBase
         }
         $className = get_called_class();
         $objectArray = array();
-        foreach ($cursor as $document)
-        {
+        foreach ($cursor as $document) {
             $objectArray[] = new $className($document);
         }
         return $objectArray;
@@ -455,8 +454,7 @@ class Mongo_ModelBase
 
         $regex = array();
 
-        foreach ($to as $key => $value)
-        {
+        foreach ($to as $key => $value) {
 
             if (isset($regex[$value])) {
 
@@ -467,14 +465,12 @@ class Mongo_ModelBase
             }
         }
 
-        foreach ($regex as $rgKey => $rg)
-        {
+        foreach ($regex as $rgKey => $rg) {
 
             $text = preg_replace("/[$rg]/", "_{$rgKey}_", $text);
         }
 
-        foreach ($regex as $rgKey => $rg)
-        {
+        foreach ($regex as $rgKey => $rg) {
 
             $text = preg_replace("/_{$rgKey}_/", "[$rg]", $text);
         }
