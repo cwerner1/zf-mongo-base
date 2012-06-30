@@ -3,14 +3,15 @@
 class Mongo_ModelBase
 {
 
-    public static $_accentStrings = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
+    public static $_accentStrings   = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
     public static $_noAccentStrings = 'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
 
     /**
      * 
      * @var MongoDB 
      */
-    public static $_mongo = null;
+    public static $_mongo  = null;
+    public static $options = null;
 
     /**
      *
@@ -23,8 +24,8 @@ class Mongo_ModelBase
      * @var string 
      */
     public static $_collectionName = null;
-    protected $id = null;
-    protected $document = null;
+    protected $id              = null;
+    protected $document        = null;
 
     /**
      * Magic methods 
@@ -80,7 +81,7 @@ class Mongo_ModelBase
         if ($this->id !== NULL) {
             $arr = array('_id' => $this->id);
         }
-        $arr = $arr + $this->document;
+        $arr  = $arr + $this->document;
 
         return $arr;
     }
@@ -238,23 +239,29 @@ class Mongo_ModelBase
      * Connect to mongo...
      * @return MongoDb 
      */
+    /*
+      $options = new stdclass();
+      $options->username = 'root';
+      $options->password = 'root';
+      $options->hostname = 'localhost';
+      $options->port = '27017';
+      $options->databasename = 'depzp4fztgs';
+     * 
+     * 
+     */
     public static function connect($options = null)
     {
         if (self::$_mongo !== null) {
             return self::$_mongo;
         }
 
-
-        if (!is_array($options)) {
-            $options = new stdclass();
-            $options->username = 'root';
-            $options->password = 'root';
-            $options->hostname = 'localhost';
-            $options->port = '27017';
-            $options->databasename = 'depzp4fztgs';
+        if (Zend_Registry::get('config')) {
+            $options = Zend_Registry::get('config')->mongodb;
+        } else {
+            return false;
         }
-
         $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
+
         $mongoOptions = array("persist" => "x");
 
 
@@ -272,6 +279,7 @@ class Mongo_ModelBase
      */
     public static function init()
     {
+
         if (self::$_mongo == null) {
             self::connect();
         }
@@ -288,6 +296,7 @@ class Mongo_ModelBase
         }
 
         $collectionName = static::$_collectionName;
+
         static::$_collection = self::$_mongo->$collectionName;
     }
 
@@ -319,7 +328,7 @@ class Mongo_ModelBase
     public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null)
     {
         $className = get_called_class();
-        $document = static::getCursor($conditionalArray, $fieldsArray, true);
+        $document  = static::getCursor($conditionalArray, $fieldsArray, true);
         if ($document == null) {
             return null;
         }
@@ -344,9 +353,9 @@ class Mongo_ModelBase
             $cursor = $cursor->limit($limit);
         }
         if ($sort != NULL) {
-            $cursor = $cursor->sort($sort);
+            $cursor      = $cursor->sort($sort);
         }
-        $className = get_called_class();
+        $className   = get_called_class();
         $objectArray = array();
         foreach ($cursor as $document) {
             $objectArray[] = new $className($document);
@@ -476,6 +485,11 @@ class Mongo_ModelBase
         }
 
         return utf8_encode($text);
+    }
+
+    public static function setOptions($options)
+    {
+        static::$options = $options;
     }
 
 }
