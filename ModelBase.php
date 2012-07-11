@@ -84,11 +84,9 @@ class Mongo_ModelBase
         if ($withID === true) {
 
             $arr = $arr + $this->document;
-            
         } else {
-            
+
             return $this->document;
-           
         }
         return $arr;
     }
@@ -186,7 +184,8 @@ class Mongo_ModelBase
                 $current[$field] = array();
             }
             $current = & $current[$field];
-            return $this->_setDotNotation(substr($fields, $i + 1), $value, $current);
+            return
+                $this->_setDotNotation(substr($fields, $i + 1), $value, $current);
         } else {
             $current[$fields] = $value;
         }
@@ -305,7 +304,8 @@ class Mongo_ModelBase
              */
 
             $replaceableClassNameparts = array('model_');
-            static::$_collectionName = str_replace($replaceableClassNameparts, '', strtolower(get_called_class()));
+            static::$_collectionName =
+                str_replace($replaceableClassNameparts, '', strtolower(get_called_class()));
         }
 
         $collectionName = static::$_collectionName;
@@ -403,7 +403,8 @@ class Mongo_ModelBase
             $fieldsArray = array();
         }
         if ($one) {
-            return static::$_collection->findOne($conditionalArray, $fieldsArray);
+            return
+                static::$_collection->findOne($conditionalArray, $fieldsArray);
         }
 
         $cursor = static::$_collection->find($conditionalArray, $fieldsArray);
