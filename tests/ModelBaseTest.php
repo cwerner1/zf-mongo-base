@@ -4,7 +4,9 @@
  * @group Mongo
  * 
  */
-require_once 'Mongo/ModelBase.php';
+
+
+require_once realpath(dirname(__FILE__). '/../ModelBase.php');
 
 class Mongo_ModelBaseTest
     extends PHPUnit_Framework_TestCase

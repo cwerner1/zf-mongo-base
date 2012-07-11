@@ -46,7 +46,6 @@ class Mongo_ModelBase
         } else {
             $this->document = array();
         }
-
     }
 
     /**
@@ -55,7 +54,6 @@ class Mongo_ModelBase
     public function __toString()
     {
         return ucfirst(static::$_collectionName) . "Object ID:" . $this->id;
-
     }
 
     /**
@@ -71,7 +69,6 @@ class Mongo_ModelBase
             return $this->_getDotNotation($name, $this->document);
         }
         return isset($this->document[$name]) ? $this->document[$name] : null;
-
     }
 
     /**
@@ -91,7 +88,6 @@ class Mongo_ModelBase
             return $this->document;
         }
         return $arr;
-
     }
 
     /**
@@ -109,7 +105,6 @@ class Mongo_ModelBase
         $this->document = $document;
 
         return $this;
-
     }
 
     /**
@@ -126,7 +121,6 @@ class Mongo_ModelBase
             unset($this->document[$name]);
         }
         $this->document[$name] = $val;
-
     }
 
     /**
@@ -137,7 +131,6 @@ class Mongo_ModelBase
     public function __isset($name)
     {
         return isset($this->document[$name]);
-
     }
 
     /**
@@ -147,7 +140,6 @@ class Mongo_ModelBase
     public function __unset($name)
     {
         unset($this->document[$name]);
-
     }
 
     /**
@@ -171,7 +163,6 @@ class Mongo_ModelBase
         } else {
             return isset($current[$fields]) ? $current[$fields] : null;
         }
-
     }
 
     /**
@@ -196,7 +187,6 @@ class Mongo_ModelBase
         } else {
             $current[$fields] = $value;
         }
-
     }
 
     /**
@@ -214,7 +204,6 @@ class Mongo_ModelBase
             return true;
         }
         return false;
-
     }
 
     /**
@@ -233,7 +222,6 @@ class Mongo_ModelBase
 
             return static::update(array("_id" => $this->id), $this->document);
         }
-
     }
 
     /**
@@ -245,7 +233,6 @@ class Mongo_ModelBase
     public function specialUpdate($modifier, $options)
     {
         return static::update(array("_id" => $this->id), $modifier, $options);
-
     }
 
     /**
@@ -272,7 +259,8 @@ class Mongo_ModelBase
             return self::$_mongo;
         }
 
-        if (Zend_Registry::isRegistered('config')) {
+        if (class_exists('Zend_Registry', false)
+            && Zend_Registry::isRegistered('config')) {
             $options = Zend_Registry::get('config')->mongodb;
         } else {
             $options  = new stdclass();
@@ -289,13 +277,11 @@ class Mongo_ModelBase
 
         $connection = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
-
     }
 
     public static function disconnect()
     {
         self::$_mongo = null;
-
     }
 
     /**
@@ -322,7 +308,6 @@ class Mongo_ModelBase
         $collectionName = static::$_collectionName;
 
         static::$_collection = self::$_mongo->$collectionName;
-
     }
 
     /**
@@ -337,7 +322,6 @@ class Mongo_ModelBase
         } else {
             return $object;
         }
-
     }
 
     /**
@@ -346,14 +330,12 @@ class Mongo_ModelBase
     public static function findAll()
     {
         return static::find();
-
     }
 
     /**
      * Get one record
      */
-    public static function findOne($conditionalArray = null,
-        $fieldsArray = null, $sort = null)
+    public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null)
     {
         $className = get_called_class();
         $document  = static::getCursor($conditionalArray, $fieldsArray, true);
@@ -362,7 +344,6 @@ class Mongo_ModelBase
         }
         $object = new $className($document);
         return $object;
-
     }
 
     /**
@@ -373,8 +354,7 @@ class Mongo_ModelBase
      * @param int $limit
      * @return this
      */
-    public static function find($conditionalArray = NULL, $fieldsArray = NULL,
-        $sort = NULL, $limit = NULL, $skip = NULL)
+    public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL)
     {
         $cursor = static::getCursor($conditionalArray, $fieldsArray);
         if ($skip != NULL) {
@@ -392,7 +372,6 @@ class Mongo_ModelBase
             $objectArray[] = new $className($document);
         }
         return $objectArray;
-
     }
 
     /*     * va
@@ -404,7 +383,6 @@ class Mongo_ModelBase
     {
         $cursor = static::getCursor($conditionalArray);
         return $cursor->count();
-
     }
 
     /**
@@ -412,8 +390,7 @@ class Mongo_ModelBase
      * @param array $conditionalArray
      * @param array $fieldsArray
      */
-    protected static function getCursor($conditionalArray = NULL,
-        $fieldsArray = NULL, $one = FALSE)
+    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = FALSE)
     {
         static::init();
         if ($conditionalArray == NULL) {
@@ -428,7 +405,6 @@ class Mongo_ModelBase
 
         $cursor = static::$_collection->find($conditionalArray, $fieldsArray);
         return $cursor;
-
     }
 
     /**
@@ -450,7 +426,6 @@ class Mongo_ModelBase
             $options['fsync'] = true;
         }
         return static::$_collection->insert($data, $options);
-
     }
 
     /**
@@ -461,7 +436,6 @@ class Mongo_ModelBase
     {
         static::init();
         return static::$_collection->batchInsert($data);
-
     }
 
     /**
@@ -476,7 +450,6 @@ class Mongo_ModelBase
 
         static::init();
         return static::$_collection->update($criteria, $update, $options);
-
     }
 
     /**
@@ -523,13 +496,6 @@ class Mongo_ModelBase
         }
 
         return utf8_encode($text);
-
-    }
-
-    public static function setOptions($options)
-    {
-        static::$options = $options;
-
     }
 
     public static function setOptions($options)
