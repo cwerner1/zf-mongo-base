@@ -6,7 +6,8 @@
  */
 require_once 'Mongo/ModelBase.php';
 
-class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
+class Mongo_ModelBaseTest
+    extends PHPUnit_Framework_TestCase
 {
 
     public function setUp(
@@ -18,24 +19,27 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
             $entry->delete();
         }
+
     }
 
     public function testCanCreateClass()
     {
         $mongo = new Mongo_ModelBase();
         $this->assertInstanceOf('Mongo_ModelBase', $mongo);
+
     }
 
     public function testConnection()
     {
         $mongoModelBase = new Mongo_ModelBase();
-        $mongoArr = $mongoModelBase::find(array('test' => '3'));
+        $mongoArr       = $mongoModelBase::find(array('test' => '3'));
         $this->assertEquals($mongoArr, array());
 
 
         $mongoModelBase->disconnect();
         $mongoArr = $mongoModelBase::find(array('test' => '3'));
         $this->assertEquals($mongoArr, array());
+
     }
 
     /*
@@ -46,13 +50,14 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     {
         $mongoModelBase = new Mongo_ModelBase();
         $mongoModelBase->test = '3';
-        $mongoDoc = $mongoModelBase->save();
+        $mongoDoc       = $mongoModelBase->save();
 
         $this->assertTrue($mongoDoc);
         $mongoModelBaseSecond = new Mongo_ModelBase();
-        $mongoRet = $mongoModelBaseSecond::findOne(array('test' => '3'));
+        $mongoRet             = $mongoModelBaseSecond::findOne(array('test'   => '3'));
         $testVal = $mongoRet->test;
         $this->assertEquals($mongoModelBase->test, $testVal);
+
     }
 
     /*
@@ -63,16 +68,17 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     {
         $mongoModelBase = new Mongo_ModelBase();
         $mongoModelBase->test = '3';
-        $mongoDoc = $mongoModelBase->save();
+        $mongoDoc       = $mongoModelBase->save();
 
         $mongoModelBase = new Mongo_ModelBase();
-        $mongoRet = $mongoModelBase::findOne(array('test' => '3'));
+        $mongoRet       = $mongoModelBase::findOne(array('test' => '3'));
 
         $mongoRetSecond = $mongoModelBase->load($mongoRet->id);
 
         $this->assertEquals($mongoRet, $mongoRetSecond);
 
         $this->assertFalse(Mongo_ModelBase::load('123a'));
+
     }
 
     /*
@@ -83,10 +89,10 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
     {
         $mongoModelBase = new Mongo_ModelBase();
         $mongoModelBase->test = '3';
-        $mongoDoc = $mongoModelBase->save();
+        $mongoDoc       = $mongoModelBase->save();
 
         $mongoModelBase = new Mongo_ModelBase();
-        $mongoRet = $mongoModelBase::find(array('test' => '3'));
+        $mongoRet       = $mongoModelBase::find(array('test' => '3'));
 
         $this->assertGreaterThan(0, count($mongoRet));
         $this->assertEquals($mongoRet[0]->test, '3');
@@ -101,39 +107,44 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
         $arr = new Mongo_ModelBase();
         $this->assertFalse($arr->delete());
+
     }
 
     public function testInsert()
     {
 
-        $arr = array('test' => '3');
+        $arr = array('test'    => '350');
         $mongoDoc = Mongo_ModelBase::insert($arr, false, true);
 
 
         $mongoModelBaseSecond = new Mongo_ModelBase();
-        $mongoRet = $mongoModelBaseSecond::findOne(array('test' => '3'));
+        $mongoRet             = $mongoModelBaseSecond::findOne(array('test'   => '350'));
         $testVal = $mongoRet->test;
 
-        $this->assertEquals('3', $testVal);
+        $this->assertEquals('350', $testVal);
+
     }
 
     public function testAccent()
     {
-        $input = "abcdefghijklmnopqrstuvwxyz";
-        $output = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jklm[nñ][o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]vwx[y¥Ýýÿ][z?]";
+        $input  = "abcdefghijklmnopqrstuvwxyz";
+        $output = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jklm[nñ]" .
+            "[o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]vwx[y¥Ýýÿ][z?]";
 
         $mongo = new Mongo_ModelBase();
 
         $this->assertEquals($output, $mongo->accentToRegex($input));
+
     }
 
     public function testConstructor()
     {
 
         $array = array('destdoc' => get_called_class());
-        $mongo = new Mongo_ModelBase($array);
+        $mongo    = new Mongo_ModelBase($array);
 
         $this->assertEquals($array, $mongo->getDocument());
+
     }
 
     public function testSetDocument()
@@ -141,18 +152,19 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $mongo = new Mongo_ModelBase();
         $this->assertFalse($mongo->setDocument());
 
-        $array = array('destdoc' => get_called_class(),
+        $array = array('destdoc'   => get_called_class(),
             'somevalue' => 'a122');
-        $mongo = new Mongo_ModelBase();
+        $mongo      = new Mongo_ModelBase();
         $mongo->setDocument($array);
         $this->assertEquals($array, $mongo->getDocument());
+
     }
 
     public function testDotNotation()
     {
-        $array = array('destdoc' => get_called_class()
+        $array = array('destdoc'   => get_called_class()
         );
-        $mongo = new Mongo_ModelBase($array);
+        $mongo      = new Mongo_ModelBase($array);
         $mongo->{'a.b.c'} = 'Dotnotation';
         $array['a'] = array('b' => array('c' => 'Dotnotation'));
 
@@ -162,36 +174,38 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
 
         $method = new ReflectionMethod(
-                        'Mongo_ModelBase', '_getDotNotation'
+                'Mongo_ModelBase', '_getDotNotation'
         );
 
         $method->setAccessible(TRUE);
 
         $this->assertNull($method->invoke(new Mongo_ModelBase, 'a.b.c', null));
+
     }
 
     public function testBatchInsert()
     {
         $users = array();
         for ($i = 0; $i < 100; $i++) {
-            $users[] = array('tofind' => 't',
+            $users[] = array('tofind'   => 't',
                 'username' => 'user' . $i,
-                'i' => $i);
+                'i'        => $i);
         }
         Mongo_ModelBase::batchInsert($users);
         $findArray = array('tofind' => 't');
 
         $count = Mongo_ModelBase::count($findArray);
         $this->assertEquals(100, $count);
+
     }
 
     public function testFindAll()
     {
         $users = array();
         for ($i = 0; $i < 43; $i++) {
-            $users[] = array('tofind' => 't',
+            $users[] = array('tofind'   => 't',
                 'username' => 'user' . $i,
-                'i' => $i);
+                'i'        => $i);
         }
         Mongo_ModelBase::batchInsert($users);
         $findArray = array('tofind' => 't');
@@ -201,20 +215,21 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
 
         $ret = Mongo_ModelBase::find(
-                        array('i' => array('$gte' => 4))
-                        , null, array('i' => -1)
+                array('i' => array('$gte' => 4))
+                , null, array('i' => -1)
         );
 
         $this->assertEquals(39, count($ret));
+
     }
 
     public function testFindSkipAndLimit()
     {
         $users = array();
         for ($i = 0; $i < 100; $i++) {
-            $users[] = array('tofind' => 't',
+            $users[] = array('tofind'   => 't',
                 'username' => 'user' . $i,
-                'i' => $i);
+                'i'        => $i);
         }
         Mongo_ModelBase::batchInsert($users);
         $findArray = array('tofind' => 't');
@@ -224,16 +239,17 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
         $return = Mongo_ModelBase::find($findArray, null, null, null, 85);
         $this->assertEquals(15, count($return));
+
     }
 
     public function testSaveAndEdit()
     {
 
-        $mongo = new Mongo_ModelBase();
+        $mongo     = new Mongo_ModelBase();
         $mongo->aaa = '1234';
         $mongo->abc = '12345';
         $mongo->save();
-        $findArray = array('aaa' => '1234');
+        $findArray = array('aaa'    => '1234');
         $finding = Mongo_ModelBase::findOne($findArray);
 
         $this->assertEquals('12345', $finding->abc);
@@ -241,7 +257,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $finding->abc = 123456;
         $finding->save();
 
-        $findArray = array('aaa' => '1234');
+        $findArray = array('aaa'    => '1234');
         $finding = Mongo_ModelBase::findOne($findArray);
 
 
@@ -258,6 +274,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
         $this->assertEquals(123456, $findingNeu->abc);
         $this->assertEquals('someValue', $findingNeu->abcdefg);
+
     }
 
     public function testCreateSave()
@@ -279,8 +296,8 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
 
 
         $mongo = null;
-        $find = array('keyToFind' => 1);
-        $mongo = Mongo_ModelBase::findOne($find);
+        $find  = array('keyToFind' => 1);
+        $mongo      = Mongo_ModelBase::findOne($find);
 
         $id = $mongo->_id;
 
@@ -290,7 +307,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals(1, $mongo->keyToFind);
 
 
-        $doc = $mongo->getDocument();
+        $doc      = $mongo->getDocument();
         $newMongo = new Mongo_ModelBase($doc);
 
         $newMongo->modifiedValue = 'Something';
@@ -304,6 +321,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $this->assertEquals('testValue', $find->testKey);
         $this->assertEquals(1, $find->keyToFind);
         $this->assertEquals('Something', $find->modifiedValue);
+
     }
 
     public function testToString()
@@ -313,6 +331,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $mongo = new Mongo_ModelBase($array);
 
         $this->assertEquals('Mongo_modelbaseObject ID:' . $array['_id'], $mongo->__toString());
+
     }
 
     public function testSet()
@@ -328,6 +347,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $mongo->test = null;
         $this->assertNull($mongo->test);
         $this->assertFalse($mongo->__isset('test'));
+
     }
 
     public function testUnSet()
@@ -339,6 +359,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $this->assertTrue($mongo->__isset('sss'));
         $mongo->__unset('sss');
         $this->assertFalse($mongo->__isset('sss'));
+
     }
 
     public function testSpecialUpdate()
@@ -346,15 +367,15 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $mongoModelBase = new Mongo_ModelBase();
         $mongoModelBase->tt = 4;
         $mongoModelBase->specialfield = 57;
-        $mongoDoc = $mongoModelBase->save();
+        $mongoDoc       = $mongoModelBase->save();
 
         $this->assertTrue($mongoDoc);
         $mongoModelBaseSecond = new Mongo_ModelBase();
-        $mongoRet = $mongoModelBaseSecond::findOne(array('tt' => 4));
+        $mongoRet             = $mongoModelBaseSecond::findOne(array('tt' => 4));
 
 
         $updateArray = array(
-            '$set' => array('ta' => 1),
+            '$set' => array('ta'   => 1),
             '$inc' => array('specialfield' => 2)
         );
         $mongoRet->specialUpdate($updateArray, array());
@@ -363,6 +384,7 @@ class Mongo_ModelBaseTest extends PHPUnit_Framework_TestCase
         $mongoRet = $mongoModelBaseSecond::findOne(array('tt' => 4));
         $this->assertEquals(1, $mongoRet->ta);
         $this->assertEquals(59, $mongoRet->specialfield);
+
     }
 
 }
