@@ -4,9 +4,7 @@
  * @group Mongo
  * 
  */
-
-
-require_once realpath(dirname(__FILE__). '/../ModelBase.php');
+require_once realpath(dirname(__FILE__) . '/../ModelBase.php');
 
 class Mongo_ModelBaseTest
     extends PHPUnit_Framework_TestCase
@@ -21,14 +19,12 @@ class Mongo_ModelBaseTest
 
             $entry->delete();
         }
-
     }
 
     public function testCanCreateClass()
     {
         $mongo = new Mongo_ModelBase();
         $this->assertInstanceOf('Mongo_ModelBase', $mongo);
-
     }
 
     public function testConnection()
@@ -41,7 +37,6 @@ class Mongo_ModelBaseTest
         $mongoModelBase->disconnect();
         $mongoArr = $mongoModelBase::find(array('test' => '3'));
         $this->assertEquals($mongoArr, array());
-
     }
 
     /*
@@ -59,7 +54,6 @@ class Mongo_ModelBaseTest
         $mongoRet             = $mongoModelBaseSecond::findOne(array('test'   => '3'));
         $testVal = $mongoRet->test;
         $this->assertEquals($mongoModelBase->test, $testVal);
-
     }
 
     /*
@@ -80,7 +74,6 @@ class Mongo_ModelBaseTest
         $this->assertEquals($mongoRet, $mongoRetSecond);
 
         $this->assertFalse(Mongo_ModelBase::load('123a'));
-
     }
 
     /*
@@ -109,7 +102,6 @@ class Mongo_ModelBaseTest
 
         $arr = new Mongo_ModelBase();
         $this->assertFalse($arr->delete());
-
     }
 
     public function testInsert()
@@ -124,7 +116,6 @@ class Mongo_ModelBaseTest
         $testVal = $mongoRet->test;
 
         $this->assertEquals('350', $testVal);
-
     }
 
     public function testAccent()
@@ -136,7 +127,6 @@ class Mongo_ModelBaseTest
         $mongo = new Mongo_ModelBase();
 
         $this->assertEquals($output, $mongo->accentToRegex($input));
-
     }
 
     public function testConstructor()
@@ -146,7 +136,6 @@ class Mongo_ModelBaseTest
         $mongo    = new Mongo_ModelBase($array);
 
         $this->assertEquals($array, $mongo->getDocument());
-
     }
 
     public function testSetDocument()
@@ -159,7 +148,6 @@ class Mongo_ModelBaseTest
         $mongo      = new Mongo_ModelBase();
         $mongo->setDocument($array);
         $this->assertEquals($array, $mongo->getDocument());
-
     }
 
     public function testDotNotation()
@@ -182,7 +170,6 @@ class Mongo_ModelBaseTest
         $method->setAccessible(TRUE);
 
         $this->assertNull($method->invoke(new Mongo_ModelBase, 'a.b.c', null));
-
     }
 
     public function testBatchInsert()
@@ -198,7 +185,6 @@ class Mongo_ModelBaseTest
 
         $count = Mongo_ModelBase::count($findArray);
         $this->assertEquals(100, $count);
-
     }
 
     public function testFindAll()
@@ -222,7 +208,6 @@ class Mongo_ModelBaseTest
         );
 
         $this->assertEquals(39, count($ret));
-
     }
 
     public function testFindSkipAndLimit()
@@ -241,7 +226,6 @@ class Mongo_ModelBaseTest
 
         $return = Mongo_ModelBase::find($findArray, null, null, null, 85);
         $this->assertEquals(15, count($return));
-
     }
 
     public function testSaveAndEdit()
@@ -276,7 +260,6 @@ class Mongo_ModelBaseTest
 
         $this->assertEquals(123456, $findingNeu->abc);
         $this->assertEquals('someValue', $findingNeu->abcdefg);
-
     }
 
     public function testCreateSave()
@@ -323,7 +306,6 @@ class Mongo_ModelBaseTest
         $this->assertEquals('testValue', $find->testKey);
         $this->assertEquals(1, $find->keyToFind);
         $this->assertEquals('Something', $find->modifiedValue);
-
     }
 
     public function testToString()
@@ -333,7 +315,6 @@ class Mongo_ModelBaseTest
         $mongo = new Mongo_ModelBase($array);
 
         $this->assertEquals('Mongo_modelbaseObject ID:' . $array['_id'], $mongo->__toString());
-
     }
 
     public function testSet()
@@ -349,7 +330,6 @@ class Mongo_ModelBaseTest
         $mongo->test = null;
         $this->assertNull($mongo->test);
         $this->assertFalse($mongo->__isset('test'));
-
     }
 
     public function testUnSet()
@@ -361,7 +341,6 @@ class Mongo_ModelBaseTest
         $this->assertTrue($mongo->__isset('sss'));
         $mongo->__unset('sss');
         $this->assertFalse($mongo->__isset('sss'));
-
     }
 
     public function testSpecialUpdate()
@@ -372,8 +351,9 @@ class Mongo_ModelBaseTest
         $mongoDoc       = $mongoModelBase->save();
 
         $this->assertTrue($mongoDoc);
-        $mongoModelBaseSecond = new Mongo_ModelBase();
-        $mongoRet             = $mongoModelBaseSecond::findOne(array('tt' => 4));
+
+        $mongoRet =
+            Mongo_ModelBase::findOne(array('tt' => 4));
 
 
         $updateArray = array(
@@ -383,10 +363,33 @@ class Mongo_ModelBaseTest
         $mongoRet->specialUpdate($updateArray, array());
 
 
-        $mongoRet = $mongoModelBaseSecond::findOne(array('tt' => 4));
+        $mongoRet =
+            Mongo_ModelBase::findOne(array('tt' => 4));
         $this->assertEquals(1, $mongoRet->ta);
         $this->assertEquals(59, $mongoRet->specialfield);
+    }
 
+    public function testGetDocument()
+    {
+
+        $control = array(
+            'someVal'      => 1234412,
+            'specialField' => 'we have a winner'
+        );
+        $controlArr    = array(
+            'someVal'      => 1234412,
+            'specialField' => 'we have a winner'
+        );
+
+        $mongoModelBase = new Mongo_ModelBase($control);
+
+        $mongoModelBase->save();
+        $return = Mongo_ModelBase::findOne(array('someVal' => 1234412));
+
+
+        $this->assertEquals($controlArr, $return->getDocument(false));
+        $this->assertEquals($control, $return->getDocument());
+        $this->assertEquals($control, $return->getDocument(true));
     }
 
 }

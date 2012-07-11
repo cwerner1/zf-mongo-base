@@ -10,8 +10,7 @@ class Mongo_ModelBase
      * 
      * @var MongoDB 
      */
-    public static $_mongo  = null;
-    public static $options = null;
+    public static $_mongo = null;
 
     /**
      *
@@ -82,10 +81,14 @@ class Mongo_ModelBase
         if ($this->id !== NULL) {
             $arr = array('_id' => $this->id);
         }
-        if ($withID) {
+        if ($withID === true) {
+
             $arr = $arr + $this->document;
+            
         } else {
+            
             return $this->document;
+           
         }
         return $arr;
     }
@@ -496,11 +499,6 @@ class Mongo_ModelBase
         }
 
         return utf8_encode($text);
-    }
-
-    public static function setOptions($options)
-    {
-        static::$options = $options;
     }
 
 }
