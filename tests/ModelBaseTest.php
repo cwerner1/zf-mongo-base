@@ -384,12 +384,38 @@ class Mongo_ModelBaseTest
         $mongoModelBase = new Mongo_ModelBase($control);
 
         $mongoModelBase->save();
-        $return = Mongo_ModelBase::findOne(array('someVal' => 1234412));
 
+        $return = Mongo_ModelBase::findOne(array('someVal'       => 1234412));
+        $control['_id'] = $return->id;
 
         $this->assertEquals($controlArr, $return->getDocument(false));
         $this->assertEquals($control, $return->getDocument());
         $this->assertEquals($control, $return->getDocument(true));
     }
+
+    public function testSetterGetterAdvanced()
+    {
+
+        $classToTest = new TestMongoClass();
+        $classToTest->name = 'somevalue';
+        $classToTest->{'some.Field.withAnLong.Name'} = 'has also an Value';
+        $classToTest->asf = 'something';
+
+        $this->assertEquals('somevalue', $classToTest->name);
+        $this->assertEquals('has also an Value', $classToTest->{'some.Field.withAnLong.Name'});
+        $this->assertEquals('something', $classToTest->{'anotherSpecialField'});
+    }
+
+}
+
+class TestMongoClass
+    extends Mongo_ModelBase
+{
+
+    public static $_collectionName = "TestMongoClass";
+    public static $fieldnames      = array(
+        'name'                       => 'n',
+        'some.Field.withAnLong.Name' => 's',
+        'anotherSpecialField'        => 'asf');
 
 }

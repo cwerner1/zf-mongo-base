@@ -27,6 +27,22 @@ class Mongo_ModelBase
     protected $document        = null;
 
     /**
+     * Contains all Variables and the short Mongo field
+     * us as key the long name you would like to use to access the field, as 
+     * value use the name of the key it will store the value
+     * 
+     * For example array('name' => 'n') 
+     * now you could use $object->name to acces the field n, and vice versa for 
+     * saving
+     * this would save space in the Database
+     * be aware not to use duplicate Fields
+     * 
+     * 
+     * @var array
+     */
+    public static $fieldnames = array();
+
+    /**
      * Magic methods 
      */
 
@@ -36,12 +52,14 @@ class Mongo_ModelBase
      */
     public function __construct($document = null)
     {
-        if ($document != null && isset($document['_id'])) {
-            $this->document = $document;
-            $this->id = $this->document['_id'];
-            unset($this->document['_id']);
-        } elseif ($document !== null) {
-            $this->document = $document;
+
+        if (isset($document['_id'])) {
+            $this->id = $document['_id'];
+        }
+        if ($document != null) {
+            foreach ($document as $key => $value) {
+                $this->__set($key, $value);
+            }
         } else {
             $this->document = array();
         }
@@ -64,6 +82,11 @@ class Mongo_ModelBase
         if ($name == "id" || $name == "_id") {
             return $this->id;
         }
+        if (isset(static::$fieldnames[$name])) {
+            $name = static::$fieldnames[$name];
+        }
+
+
         if (false !== strpos($name, '.')) {
             return $this->_getDotNotation($name, $this->document);
         }
@@ -86,7 +109,10 @@ class Mongo_ModelBase
             $arr = $arr + $this->document;
         } else {
 
-            return $this->document;
+            $return = $this->document;
+            unset($return['id'], $return['_id']);
+
+            return $return;
         }
         return $arr;
     }
@@ -115,6 +141,11 @@ class Mongo_ModelBase
      */
     public function __set($name, $val)
     {
+
+        if (isset(static::$fieldnames[$name])) {
+            $name = static::$fieldnames[$name];
+        }
+
         if (false !== strpos($name, '.')) {
             return $this->_setDotNotation($name, $val, $this->document);
         }
