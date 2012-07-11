@@ -35,6 +35,7 @@ class Mongo_ModelBaseTest
 
 
         $mongoModelBase->disconnect();
+        /* @var $mongoArr Mongo_ModelBase */
         $mongoArr = $mongoModelBase::find(array('test' => '3'));
         $this->assertEquals($mongoArr, array());
     }
@@ -51,8 +52,9 @@ class Mongo_ModelBaseTest
 
         $this->assertTrue($mongoDoc);
         $mongoModelBaseSecond = new Mongo_ModelBase();
-        $mongoRet             = $mongoModelBaseSecond::findOne(array('test'   => '3'));
-        $testVal = $mongoRet->test;
+        $find                 = array('test'    => '3');
+        $mongoRet = $mongoModelBaseSecond::findOne($find);
+        $testVal  = $mongoRet->test;
         $this->assertEquals($mongoModelBase->test, $testVal);
     }
 
@@ -112,8 +114,9 @@ class Mongo_ModelBaseTest
 
 
         $mongoModelBaseSecond = new Mongo_ModelBase();
-        $mongoRet             = $mongoModelBaseSecond::findOne(array('test'   => '350'));
-        $testVal = $mongoRet->test;
+        $find                 = array('test'    => '350');
+        $mongoRet = $mongoModelBaseSecond::findOne($find);
+        $testVal  = $mongoRet->test;
 
         $this->assertEquals('350', $testVal);
     }
@@ -121,8 +124,8 @@ class Mongo_ModelBaseTest
     public function testAccent()
     {
         $input  = "abcdefghijklmnopqrstuvwxyz";
-        $output = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jklm[nñ]" .
-            "[o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]vwx[y¥Ýýÿ][z?]";
+        $output = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jklm" .
+            "[nñ][o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]vwx[y¥Ýýÿ][z?]";
 
         $mongo = new Mongo_ModelBase();
 
@@ -163,9 +166,7 @@ class Mongo_ModelBaseTest
         $this->assertEquals('Dotnotation', $mongo->{'a.b.c'});
 
 
-        $method = new ReflectionMethod(
-                'Mongo_ModelBase', '_getDotNotation'
-        );
+        $method = new ReflectionMethod('Mongo_ModelBase', '_getDotNotation');
 
         $method->setAccessible(TRUE);
 
@@ -201,11 +202,9 @@ class Mongo_ModelBaseTest
         $ret = Mongo_ModelBase::findAll();
         $this->assertEquals(43, count($ret));
 
+        $findArray = array('i' => array('$gte' => 4));
 
-        $ret = Mongo_ModelBase::find(
-                array('i' => array('$gte' => 4))
-                , null, array('i' => -1)
-        );
+        $ret = Mongo_ModelBase::find($findArray, null, array('i' => -1));
 
         $this->assertEquals(39, count($ret));
     }
@@ -402,7 +401,7 @@ class Mongo_ModelBaseTest
         $classToTest->asf = 'something';
 
         $this->assertEquals('somevalue', $classToTest->name);
-          $this->assertEquals('somevalue', $classToTest->n);
+        $this->assertEquals('somevalue', $classToTest->n);
         $this->assertEquals('has also an Value', $classToTest->{'some.Field.withAnLong.Name'});
         $this->assertEquals('has also an Value', $classToTest->{'s'});
         $this->assertEquals('something', $classToTest->{'anotherSpecialField'});

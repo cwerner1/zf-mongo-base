@@ -49,6 +49,7 @@ class Mongo_ModelBase
     /**
      * Constructor puts full object in $document variable and assigns $id
      * @param $document
+     * 
      */
     public function __construct($document = null)
     {
@@ -360,7 +361,9 @@ class Mongo_ModelBase
 
     /**
      * Find all records in a collection
+     * @return $this
      */
+    
     public static function findAll()
     {
         return static::find();
