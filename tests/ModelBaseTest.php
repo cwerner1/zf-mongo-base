@@ -402,8 +402,11 @@ class Mongo_ModelBaseTest
         $classToTest->asf = 'something';
 
         $this->assertEquals('somevalue', $classToTest->name);
+          $this->assertEquals('somevalue', $classToTest->n);
         $this->assertEquals('has also an Value', $classToTest->{'some.Field.withAnLong.Name'});
+        $this->assertEquals('has also an Value', $classToTest->{'s'});
         $this->assertEquals('something', $classToTest->{'anotherSpecialField'});
+        $this->assertEquals('something', $classToTest->{'asf'});
     }
 
 }
