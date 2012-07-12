@@ -310,7 +310,8 @@ class Mongo_ModelBase
                 $options->port = static::$connectOptions['port'];
             }
             if (isset(static::$connectOptions['databasename'])) {
-                $options->databasename = static::$connectOptions['databasename'];
+                $options->databasename
+                    = static::$connectOptions['databasename'];
             }
         } else {
             $options  = new stdclass();
@@ -393,7 +394,8 @@ class Mongo_ModelBase
 
         $className = get_called_class();
 
-        $document = static::getCursor($conditionalArray, $fieldsArray, true, $className);
+        $document =
+            static::getCursor($conditionalArray, $fieldsArray, true);
         if ($document == null) {
             return null;
         }
@@ -412,7 +414,8 @@ class Mongo_ModelBase
     public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL)
     {
         $className = get_called_class();
-        $cursor    = static::getCursor($conditionalArray, $fieldsArray, NULL, $className);
+        $cursor    =
+            static::getCursor($conditionalArray, $fieldsArray, NULL, $className);
         if ($skip != NULL) {
             $cursor = $cursor->skip($skip);
         }
@@ -448,7 +451,7 @@ class Mongo_ModelBase
      */
     protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = false)
     {
-       
+
         $calledClass = get_called_class();
 
         static::init($calledClass);
@@ -478,7 +481,7 @@ class Mongo_ModelBase
     public static function insert($data, $safe = false, $fsync = false)
     {
 
-       
+
         $calledClass = get_called_class();
         static::init($calledClass);
         $options     = array();
