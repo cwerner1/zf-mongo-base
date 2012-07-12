@@ -419,7 +419,7 @@ class Mongo_ModelBaseTest
 
         $opened = TestMongoClass::find();
 
-        $this->assertNotEquals(NULL,TestMongoClass::$_mongo);
+        $this->assertNotEquals(NULL, TestMongoClass::$_mongo);
         $this->assertEquals(TestMongoClass::$_mongo, TestMongoClass::connect('TestMongoClass'));
     }
 
