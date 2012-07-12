@@ -27,6 +27,12 @@ class Mongo_ModelBase
     protected $document        = null;
 
     /**
+     * hold Connections Options
+     * @var array
+     */
+    public static $connectOptions = null;
+
+    /**
      * Contains all Variables and the short Mongo field
      * us as key the long name you would like to use to access the field, as 
      * value use the name of the key it will store the value
@@ -277,16 +283,6 @@ class Mongo_ModelBase
      * Connect to mongo...
      * @return MongoDb 
      */
-    /*
-      $options = new stdclass();
-      $options->username = 'root';
-      $options->password = 'root';
-      $options->hostname = 'localhost';
-      $options->port = '27017';
-      $options->databasename = 'depzp4fztgs';
-     * 
-     * 
-     */
     public static function connect($options = null)
     {
         if (self::$_mongo !== null) {
@@ -296,6 +292,25 @@ class Mongo_ModelBase
         if (class_exists('Zend_Registry', false)
             && Zend_Registry::isRegistered('config')) {
             $options = Zend_Registry::get('config')->mongodb;
+        } elseif (self::$connectOptions != array()) {
+         
+            $options = new stdClass();
+
+            if (isset(self::$connectOptions['username'])) {
+                $options->username = self::$connectOptions['username'];
+            }
+            if (isset(self::$connectOptions['password'])) {
+                $options->password = self::$connectOptions['password'];
+            }
+            if (isset(self::$connectOptions['hostname'])) {
+                $options->hostname = self::$connectOptions['hostname'];
+            }
+            if (isset(self::$connectOptions['port'])) {
+                $options->port = self::$connectOptions['port'];
+            }
+            if (isset(self::$connectOptions['databasename'])) {
+                $options->databasename = self::$connectOptions['databasename'];
+            }
         } else {
             $options  = new stdclass();
             $options->username = 'root';
@@ -363,7 +378,6 @@ class Mongo_ModelBase
      * Find all records in a collection
      * @return $this
      */
-    
     public static function findAll()
     {
         return static::find();
