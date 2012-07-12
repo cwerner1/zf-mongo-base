@@ -414,6 +414,15 @@ class Mongo_ModelBaseTest
         $this->assertEquals('something', $classToTest->{'asf'});
     }
 
+    public function testConnect()
+    {
+
+        $opened = TestMongoClass::find();
+
+        $this->assertNotEquals(NULL,TestMongoClass::$_mongo);
+        $this->assertEquals(TestMongoClass::$_mongo, TestMongoClass::connect('TestMongoClass'));
+    }
+
 }
 
 class TestMongoClass
@@ -421,7 +430,7 @@ class TestMongoClass
 {
 
     public static $connectOptions = array(
-        'user'           => 'root',
+        'username'       => 'root',
         'password'       => 'password',
         'databasename'   => 'MongoAdvancedTestConnectionDatabaseName',
         'hostname'       => 'localhost',
@@ -432,6 +441,12 @@ class TestMongoClass
         'name'                       => 'n',
         'some.Field.withAnLong.Name' => 's',
         'anotherSpecialField'        => 'asf');
+
+    public function __construct($document = null)
+    {
+        parent::disconnect();
+        parent::__construct($document);
+    }
 
 }
 

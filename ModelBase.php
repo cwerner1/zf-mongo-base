@@ -290,7 +290,6 @@ class Mongo_ModelBase
             return self::$_mongo;
         }
 
-
         if (class_exists('Zend_Registry', false)
             && Zend_Registry::isRegistered('config')) {
             $options = Zend_Registry::get('config')->mongodb;
