@@ -281,35 +281,37 @@ class Mongo_ModelBase
 
     /**
      * Connect to mongo...
+     * @param string $calledClass   Name of the Calling Class
      * @return MongoDb 
      */
-    public static function connect($options = null)
+    public static function connect($calledClass)
     {
         if (self::$_mongo !== null) {
             return self::$_mongo;
         }
 
+
         if (class_exists('Zend_Registry', false)
             && Zend_Registry::isRegistered('config')) {
             $options = Zend_Registry::get('config')->mongodb;
-        } elseif (self::$connectOptions != array()) {
-         
+        } elseif ($calledClass::$connectOptions != array()) {
+
             $options = new stdClass();
 
-            if (isset(self::$connectOptions['username'])) {
-                $options->username = self::$connectOptions['username'];
+            if (isset(static::$connectOptions['username'])) {
+                $options->username = static::$connectOptions['username'];
             }
-            if (isset(self::$connectOptions['password'])) {
-                $options->password = self::$connectOptions['password'];
+            if (isset(static::$connectOptions['password'])) {
+                $options->password = static::$connectOptions['password'];
             }
-            if (isset(self::$connectOptions['hostname'])) {
-                $options->hostname = self::$connectOptions['hostname'];
+            if (isset(static::$connectOptions['hostname'])) {
+                $options->hostname = static::$connectOptions['hostname'];
             }
-            if (isset(self::$connectOptions['port'])) {
-                $options->port = self::$connectOptions['port'];
+            if (isset(static::$connectOptions['port'])) {
+                $options->port = static::$connectOptions['port'];
             }
-            if (isset(self::$connectOptions['databasename'])) {
-                $options->databasename = self::$connectOptions['databasename'];
+            if (isset(static::$connectOptions['databasename'])) {
+                $options->databasename = static::$connectOptions['databasename'];
             }
         } else {
             $options  = new stdclass();
@@ -335,14 +337,14 @@ class Mongo_ModelBase
 
     /**
      * Setup db connection and init mongo collection
+     * @param $called_class     ClassName
      */
-    public static function init()
+    public static function init($calledClass)
     {
 
         if (self::$_mongo == null) {
-            self::connect();
+            self::connect($calledClass);
         }
-
         if (static::$_collectionName == null) {
             /*
              * Get collection name based on the class name. 
@@ -388,8 +390,11 @@ class Mongo_ModelBase
      */
     public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null)
     {
+
+
         $className = get_called_class();
-        $document  = static::getCursor($conditionalArray, $fieldsArray, true);
+
+        $document = static::getCursor($conditionalArray, $fieldsArray, true, $className);
         if ($document == null) {
             return null;
         }
@@ -407,7 +412,8 @@ class Mongo_ModelBase
      */
     public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL)
     {
-        $cursor = static::getCursor($conditionalArray, $fieldsArray);
+        $className = get_called_class();
+        $cursor    = static::getCursor($conditionalArray, $fieldsArray, NULL, $className);
         if ($skip != NULL) {
             $cursor = $cursor->skip($skip);
         }
@@ -415,9 +421,9 @@ class Mongo_ModelBase
             $cursor = $cursor->limit($limit);
         }
         if ($sort != NULL) {
-            $cursor      = $cursor->sort($sort);
+            $cursor = $cursor->sort($sort);
         }
-        $className   = get_called_class();
+
         $objectArray = array();
         foreach ($cursor as $document) {
             $objectArray[] = new $className($document);
@@ -441,9 +447,12 @@ class Mongo_ModelBase
      * @param array $conditionalArray
      * @param array $fieldsArray
      */
-    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = FALSE)
+    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = false)
     {
-        static::init();
+       
+        $calledClass = get_called_class();
+
+        static::init($calledClass);
         if ($conditionalArray == NULL) {
             $conditionalArray = array();
         }
@@ -469,8 +478,11 @@ class Mongo_ModelBase
      */
     public static function insert($data, $safe = false, $fsync = false)
     {
-        static::init();
-        $options = array();
+
+       
+        $calledClass = get_called_class();
+        static::init($calledClass);
+        $options     = array();
         if ($safe) {
             $options['safe'] = true;
         }
@@ -486,7 +498,9 @@ class Mongo_ModelBase
      */
     public static function batchInsert($data)
     {
-        static::init();
+
+        $calledClass = get_called_class();
+        static::init($calledClass);
         return static::$_collection->batchInsert($data);
     }
 
@@ -499,8 +513,8 @@ class Mongo_ModelBase
      */
     public static function update($criteria, $update, $options = array())
     {
-
-        static::init();
+        $calledClass = get_called_class();
+        static::init($calledClass);
         return static::$_collection->update($criteria, $update, $options);
     }
 

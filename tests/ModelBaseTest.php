@@ -10,11 +10,16 @@ class Mongo_ModelBaseTest
     extends PHPUnit_Framework_TestCase
 {
 
-    public function setUp(
-    )
+    public function setUp()
     {
 
         $testEntrys = Mongo_ModelBase::find();
+        foreach ($testEntrys as $key => $entry) {
+
+            $entry->delete();
+        }
+
+        $testEntrys = TestMongoClass::find();
         foreach ($testEntrys as $key => $entry) {
 
             $entry->delete();
@@ -396,10 +401,11 @@ class Mongo_ModelBaseTest
     {
 
         $classToTest = new TestMongoClass();
+
         $classToTest->name = 'somevalue';
         $classToTest->{'some.Field.withAnLong.Name'} = 'has also an Value';
         $classToTest->asf = 'something';
-
+        $classToTest->save();
         $this->assertEquals('somevalue', $classToTest->name);
         $this->assertEquals('somevalue', $classToTest->n);
         $this->assertEquals('has also an Value', $classToTest->{'some.Field.withAnLong.Name'});
@@ -414,6 +420,13 @@ class TestMongoClass
     extends Mongo_ModelBase
 {
 
+    public static $connectOptions = array(
+        'user'           => 'root',
+        'password'       => 'password',
+        'databasename'   => 'MongoAdvancedTestConnectionDatabaseName',
+        'hostname'       => 'localhost',
+        'port'           => '27017'
+    );
     public static $_collectionName = "TestMongoClass";
     public static $fieldnames      = array(
         'name'                       => 'n',
@@ -421,3 +434,4 @@ class TestMongoClass
         'anotherSpecialField'        => 'asf');
 
 }
+
