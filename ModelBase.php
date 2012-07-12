@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Mongo Class to Connect to a Mongo Database
+ * @package Mongo 
+ */
 class Mongo_ModelBase
 {
 
@@ -484,7 +488,8 @@ class Mongo_ModelBase
 
         $calledClass = get_called_class();
         static::init($calledClass);
-        $options     = array();
+
+        $options = array();
         if ($safe) {
             $options['safe'] = true;
         }
