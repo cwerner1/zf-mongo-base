@@ -319,8 +319,8 @@ class Mongo_ModelBase
             }
         } else {
             $options  = new stdclass();
-            $options->username = 'root';
-            $options->password = 'root';
+            $options->username = 'test';
+            $options->password = 'test';
             $options->hostname = 'localhost';
             $options->port = '27017';
             $options->databasename = 'MongoTestDatabase';
