@@ -430,8 +430,8 @@ class TestMongoClass
 {
 
     public static $connectOptions = array(
-        'username'       => 'root',
-        'password'       => 'password',
+        'username'       => 'test',
+        'password'       => 'testing',
         'databasename'   => 'MongoAdvancedTestConnectionDatabaseName',
         'hostname'       => 'localhost',
         'port'           => '27017'
