@@ -571,5 +571,56 @@ class Mongo_ModelBase
         return utf8_encode($text);
     }
 
+    /**
+     * Finding all of the distinct values for a key.    
+     * 
+     * @param string $key
+     * @param array $query
+     * @return $self 
+     */
+    public static function distinct($key = NULL, $query = NULL)
+    {
+
+
+        //static::$_collection = self::$_mongo->$collectionName;
+        $command = array(
+            'distinct' => static::$_collectionName,
+            'key'      => $key,
+            'query'    => $query
+        );
+
+        return self::$_mongo->command($command);
+    }
+
+    /**
+     * This changes the current database profiling level.
+     * Profiled queries will appear in the system.profile collection of 
+     * this database.
+     * http://www.php.net/manual/de/mongodb.setprofilinglevel.php
+     * 
+     * @param int $level
+     * <ul>
+     * <li>0 off</li>
+     * <li>1 queries > 100ms</li>
+     * <li>2 all queries</li>
+     * </ul>
+     * @param int $slowms
+     * @return type 
+     */
+    public function setProfilingLevel($level, $slowms = null)
+    {
+
+        $command = array(
+            'profile' => $level,
+            'slowms'  => $slowms
+        );
+        return self::$_mongo->command($command);
+    }
+
+    public function getProfilingLevel()
+    {
+        return self::$_mongo->command(array('profile' => -1));
+    }
+
 }
 

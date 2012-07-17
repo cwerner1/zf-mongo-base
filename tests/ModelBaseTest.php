@@ -373,6 +373,61 @@ class Mongo_ModelBaseTest
         $this->assertEquals(59, $mongoRet->specialfield);
     }
 
+    public function testDistinct()
+    {
+        $testMongo = new Mongo_ModelBase();
+        $testMongo->name = 'Joe';
+        $testMongo->age = 4;
+        $testMongo->save();
+
+        $testMongo = new Mongo_ModelBase();
+        $testMongo->name = 'Sally';
+        $testMongo->age = 22;
+        $testMongo->save();
+
+        $testMongo = new Mongo_ModelBase();
+        $testMongo->name = 'Dave';
+        $testMongo->age = 22;
+        $testMongo->save();
+
+        $testMongo = new Mongo_ModelBase();
+        $testMongo->name = 'Moly';
+        $testMongo->age = 87;
+        $testMongo->save();
+
+
+        $control = array(4, 22, 87);
+
+        $return = Mongo_ModelBase::distinct('age');
+
+        $this->assertEquals($control, $return['values']);
+
+        $control = array(22, 87);
+        $query = array('age' => array('$gte' => 18));
+
+        $return = Mongo_ModelBase::distinct('age', $query);
+
+        $this->assertEquals($control, $return['values']);
+    }
+
+    public function testProfiling()
+    {
+
+        Mongo_ModelBase::setProfilingLevel(1);
+
+        $return = Mongo_ModelBase::getProfilingLevel();
+
+        $this->assertEquals(1, $return['was']);
+        $this->assertEquals(1, $return['ok']);
+
+        Mongo_ModelBase::setProfilingLevel(2);
+
+        $return = Mongo_ModelBase::getProfilingLevel();
+
+        $this->assertEquals(2, $return['was']);
+        $this->assertEquals(1, $return['ok']);
+    }
+
     public function testGetDocument()
     {
 
