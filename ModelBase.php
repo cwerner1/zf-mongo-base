@@ -7,6 +7,8 @@
 class Mongo_ModelBase
 {
 
+    const EXCEPTION_COLLECTIONAME_REMOVED = "_collectionName has been removed, use collectioName instead";
+
     public static $_accentStrings   = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
     public static $_noAccentStrings = 'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
 
@@ -23,12 +25,17 @@ class Mongo_ModelBase
     public static $_collection = null;
 
     /**
-     *
+     * collectionName
      * @var string 
      */
-    public static $_collectionName = null;
-    protected $id              = null;
-    protected $document        = null;
+    public static $collectionName = null;
+    protected $id             = null;
+    protected $document       = null;
+
+    /**
+     * Database Indexes
+     */
+    public static $indexes = array();
 
     /**
      * hold Connections Options
@@ -64,6 +71,10 @@ class Mongo_ModelBase
     public function __construct($document = null)
     {
 
+        if (isset(static::$_collectionName)) {
+            throw new Exception(Mongo_ModelBase::EXCEPTION_COLLECTIONAME_REMOVED);
+        }
+
         if (isset($document['_id'])) {
             $this->id = $document['_id'];
         }
@@ -81,7 +92,7 @@ class Mongo_ModelBase
      */
     public function __toString()
     {
-        return ucfirst(static::$_collectionName) . "Object ID:" . $this->id;
+        return ucfirst(static::$collectionName) . "Object ID:" . $this->id;
     }
 
     /**
@@ -318,14 +329,14 @@ class Mongo_ModelBase
                     = static::$connectOptions['databasename'];
             }
         } else {
-            $options  = new stdclass();
-            $options->username = 'test';
-            $options->password = 'test';
-            $options->hostname = 'localhost';
-            $options->port = '27017';
+            $options               = new stdclass();
+            $options->username     = 'test';
+            $options->password     = 'test';
+            $options->hostname     = 'localhost';
+            $options->port         = '27017';
             $options->databasename = 'MongoTestDatabase';
         }
-        $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
+        $mongoDns              = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
 
         $mongoOptions = array("persist" => "x");
 
@@ -349,7 +360,7 @@ class Mongo_ModelBase
         if (self::$_mongo == null) {
             self::connect($calledClass);
         }
-        if (static::$_collectionName == null) {
+        if (static::$collectionName == null) {
             /*
              * Get collection name based on the class name. 
              * To do this, we take the class name and strip off the
@@ -357,11 +368,11 @@ class Mongo_ModelBase
              */
 
             $replaceableClassNameparts = array('model_');
-            static::$_collectionName =
+            static::$collectionName =
                 str_replace($replaceableClassNameparts, '', strtolower(get_called_class()));
         }
 
-        $collectionName = static::$_collectionName;
+        $collectionName = static::$collectionName;
 
         static::$_collection = self::$_mongo->$collectionName;
     }
@@ -584,7 +595,7 @@ class Mongo_ModelBase
 
         //static::$_collection = self::$_mongo->$collectionName;
         $command = array(
-            'distinct' => static::$_collectionName,
+            'distinct' => static::$collectionName,
             'key'      => $key,
             'query'    => $query
         );
@@ -620,6 +631,20 @@ class Mongo_ModelBase
     public function getProfilingLevel()
     {
         return self::$_mongo->command(array('profile' => -1));
+    }
+
+    /**
+     * Setup Collection Index
+     * @return bool
+     */
+    public static function setUpIndexes()
+    {
+        return static::$_collection->ensureIndex(static::$indexes);
+    }
+
+    public static function getIndexInfo()
+    {
+        return static::$_collection->getIndexInfo();
     }
 
 }
