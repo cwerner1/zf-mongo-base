@@ -523,12 +523,11 @@ class TestMongoConstructThrowExcpectionClass
     extends Mongo_ModelBase
 {
 
-    /**
-     * Will throw an Exception
-     * @var string 
-     */
+// @codingStandardsIgnoreStart
+
     public static $_collectionName = "TestMongoClass";
 
+// @codingStandardsIgnoreEnd
 }
 
 class TestMongoClass
