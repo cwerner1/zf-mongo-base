@@ -122,8 +122,8 @@ class Mongo_ModelBaseTest
     public function testAccent()
     {
         $input       = "abcdefghijklmnopqrstuvwxyz";
-        $outputArr[] = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jkl";
-        $outputArr[] = "m[nñ][o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]";
+        $outputArr[] = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï";
+        $outputArr[] = "?]jklm[nñ][o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]";
         $outputArr[] = "vwx[y¥Ýýÿ][z?]";
 
 
