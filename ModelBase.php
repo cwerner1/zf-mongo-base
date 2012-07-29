@@ -16,13 +16,13 @@ class Mongo_ModelBase
      * 
      * @var MongoDB 
      */
-    public static $_mongo = null;
+    private static $_mongo = null;
 
     /**
      *
      * @var MongoCollection  
      */
-    public static $_collection = null;
+    private static $_collection = null;
 
     /**
      * collectionName
@@ -93,6 +93,15 @@ class Mongo_ModelBase
     public function __toString()
     {
         return ucfirst(static::$collectionName) . "Object ID:" . $this->id;
+    }
+
+    /**
+     * returns the MongoDB Object
+     * @return MongoDB
+     */
+    public static function getMongo()
+    {
+        return self::$_mongo;
     }
 
     /**
@@ -255,7 +264,7 @@ class Mongo_ModelBase
     {
         if ($this->id != null) {
 
-            static::$_collection->remove(array("_id" => $this->id));
+            self::$_collection->remove(array("_id" => $this->id));
             return true;
         }
         return false;
@@ -374,7 +383,7 @@ class Mongo_ModelBase
 
         $collectionName = static::$collectionName;
 
-        static::$_collection = self::$_mongo->$collectionName;
+        self::$_collection = self::$_mongo->$collectionName;
     }
 
     /**
@@ -478,10 +487,10 @@ class Mongo_ModelBase
         }
         if ($one) {
             return
-                static::$_collection->findOne($conditionalArray, $fieldsArray);
+                self::$_collection->findOne($conditionalArray, $fieldsArray);
         }
 
-        $cursor = static::$_collection->find($conditionalArray, $fieldsArray);
+        $cursor = self::$_collection->find($conditionalArray, $fieldsArray);
         return $cursor;
     }
 
@@ -507,7 +516,7 @@ class Mongo_ModelBase
         if ($fsync) {
             $options['fsync'] = true;
         }
-        return static::$_collection->insert($data, $options);
+        return self::$_collection->insert($data, $options);
     }
 
     /**
@@ -519,7 +528,7 @@ class Mongo_ModelBase
 
         $calledClass = get_called_class();
         static::init($calledClass);
-        return static::$_collection->batchInsert($data);
+        return self::$_collection->batchInsert($data);
     }
 
     /**
@@ -533,7 +542,7 @@ class Mongo_ModelBase
     {
         $calledClass = get_called_class();
         static::init($calledClass);
-        return static::$_collection->update($criteria, $update, $options);
+        return self::$_collection->update($criteria, $update, $options);
     }
 
     /**
@@ -639,12 +648,12 @@ class Mongo_ModelBase
      */
     public static function setUpIndexes()
     {
-        return static::$_collection->ensureIndex(static::$indexes);
+        return self::$_collection->ensureIndex(static::$indexes);
     }
 
     public static function getIndexInfo()
     {
-        return static::$_collection->getIndexInfo();
+        return self::$_collection->getIndexInfo();
     }
 
 }

@@ -425,10 +425,10 @@ class Mongo_ModelBaseTest
 
         Mongo_ModelBase::setProfilingLevel(2);
 
-        $return = Mongo_ModelBase::getProfilingLevel();
+        $returnArr = Mongo_ModelBase::getProfilingLevel();
 
-        $this->assertEquals(2, $return['was']);
-        $this->assertEquals(1, $return['ok']);
+        $this->assertEquals(2, $returnArr['was']);
+        $this->assertEquals(1, $returnArr['ok']);
     }
 
     public function testGetDocument()
@@ -475,10 +475,10 @@ class Mongo_ModelBaseTest
     public function testConnect()
     {
 
-        $opened = TestMongoClass::find();
+        TestMongoClass::find();
 
-        $this->assertNotEquals(NULL, TestMongoClass::$_mongo);
-        $this->assertEquals(TestMongoClass::$_mongo, TestMongoClass::connect('TestMongoClass'));
+        $this->assertNotEquals(NULL, TestMongoClass::getMongo());
+        $this->assertEquals(TestMongoClass::getMongo(), TestMongoClass::connect('TestMongoClass'));
     }
 
     public function testIndexes()
@@ -486,14 +486,14 @@ class Mongo_ModelBaseTest
         $docOne = array('a'     => '1');
         $ab     = new Mongo_ModelBase($docOne);
         $ab->save();
-        $docOne = array('a'     => '2');
-        $ac     = new Mongo_ModelBase($docOne);
+        $docTwo = array('a'       => '2');
+        $ac       = new Mongo_ModelBase($docTwo);
         $ac->save();
-        $docOne = array('a'     => '3');
-        $ad     = new Mongo_ModelBase($docOne);
+        $docThree = array('a'      => '3');
+        $ad      = new Mongo_ModelBase($docThree);
         $ad->save();
-        $docOne = array('a' => '4');
-        $ae = new Mongo_ModelBase($docOne);
+        $docFour = array('a' => '4');
+        $ae = new Mongo_ModelBase($docFour);
         $ae->save();
 
         /**
@@ -511,10 +511,10 @@ class Mongo_ModelBaseTest
 
 
 
-        $indexs = Mongo_ModelBase::getIndexInfo();
-        $this->assertEquals('_id_', $indexs[0]['name']);
+        $indexsSecond = Mongo_ModelBase::getIndexInfo();
+        $this->assertEquals('_id_', $indexsSecond[0]['name']);
 
-        $this->assertEquals('a_1', $indexs[1]['name']);
+        $this->assertEquals('a_1', $indexsSecond[1]['name']);
     }
 
 }
