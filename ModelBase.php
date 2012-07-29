@@ -323,39 +323,56 @@ class Mongo_ModelBase
             $options = Zend_Registry::get('config')->mongodb;
         } elseif ($calledClass::$connectOptions != array()) {
 
-            $options = new stdClass();
-
-            if (isset(static::$connectOptions['username'])) {
-                $options->username = static::$connectOptions['username'];
-            }
-            if (isset(static::$connectOptions['password'])) {
-                $options->password = static::$connectOptions['password'];
-            }
-            if (isset(static::$connectOptions['hostname'])) {
-                $options->hostname = static::$connectOptions['hostname'];
-            }
-            if (isset(static::$connectOptions['port'])) {
-                $options->port = static::$connectOptions['port'];
-            }
-            if (isset(static::$connectOptions['databasename'])) {
-                $options->databasename
-                    = static::$connectOptions['databasename'];
-            }
+            $options = static::connectArrayToClass($calledClass::$connectOptions);
         } else {
-            $options               = new stdclass();
-            $options->username     = 'test';
-            $options->password     = 'test';
-            $options->hostname     = 'localhost';
-            $options->port         = '27017';
-            $options->databasename = 'MongoTestDatabase';
+            $options  = static::connectDefault();
         }
-        $mongoDns              = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
+        $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
 
         $mongoOptions = array("persist" => "x");
 
 
         $connection = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
+    }
+
+    public static function connectArrayToClass($connectOptions)
+    {
+        $options = new stdClass();
+
+        if (isset($connectOptions['username'])) {
+            $options->username = $connectOptions['username'];
+        }
+        if (isset($connectOptions['password'])) {
+            $options->password = $connectOptions['password'];
+        }
+        if (isset($connectOptions['hostname'])) {
+            $options->hostname = $connectOptions['hostname'];
+        }
+        if (isset($connectOptions['port'])) {
+            $options->port = $connectOptions['port'];
+        }
+        if (isset($connectOptions['databasename'])) {
+            $options->databasename
+                = $connectOptions['databasename'];
+        }
+        return $options;
+    }
+
+    /**
+     * Returns Default Connection Params
+     * @return \stdclass
+     */
+    public static function connectDefault()
+    {
+        $options               = new stdclass();
+        $options->username     = 'test';
+        $options->password     = 'test';
+        $options->hostname     = 'localhost';
+        $options->port         = '27017';
+        $options->databasename = 'MongoTestDatabase';
+
+        return $options;
     }
 
     public static function disconnect()
