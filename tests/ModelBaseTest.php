@@ -139,7 +139,7 @@ class Mongo_ModelBaseTest
             $this->fail('Error not Trapped');
         } catch (Exception $e)
         {
-            $this->assertEquals(Mongo_ModelBase::EXCEPTION_COLLECTIONAME_REMOVED, $e->getMessage());
+            $this->assertEquals(Mongo_ModelBase::EXCEPTION_CNAME_REMOVED, $e->getMessage());
         }
 
         $array = array('destdoc' => get_called_class());

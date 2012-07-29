@@ -7,7 +7,7 @@
 class Mongo_ModelBase
 {
 
-    const EXCEPTION_COLLECTIONAME_REMOVED = "_collectionName has been removed, use collectioName instead";
+    const EXCEPTION_CNAME_REMOVED = "_collectionName has been removed, use collectioName instead";
 
     private static $_accentStrings   = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
     private static $_noAccentStrings = 'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
@@ -72,7 +72,7 @@ class Mongo_ModelBase
     {
 
         if (isset(static::$_collectionName)) {
-            throw new Exception(Mongo_ModelBase::EXCEPTION_COLLECTIONAME_REMOVED);
+            throw new Exception(Mongo_ModelBase::EXCEPTION_CNAME_REMOVED);
         }
 
         if (isset($document['_id'])) {
@@ -246,8 +246,9 @@ class Mongo_ModelBase
                 $current[$field] = array();
             }
             $current = & $current[$field];
-            return
-                $this->_setDotNotation(substr($fields, $i + 1), $value, $current);
+
+            $shortField = substr($fields, $i + 1);
+            return $this->_setDotNotation($shortField, $value, $current);
         } else {
             $current[$fields] = $value;
         }
@@ -412,7 +413,9 @@ class Mongo_ModelBase
     /**
      * Get one record
      */
-    public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null)
+    public static function findOne($conditionalArray = null
+    , $fieldsArray = null
+    , $sort = null)
     {
 
 
@@ -435,7 +438,12 @@ class Mongo_ModelBase
      * @param int $limit
      * @return this
      */
-    public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL)
+    public static function find(
+    $conditionalArray = NULL
+    , $fieldsArray = NULL
+    , $sort = NULL
+    , $limit = NULL
+    , $skip = NULL)
     {
         $className = get_called_class();
         $cursor    =
@@ -473,7 +481,9 @@ class Mongo_ModelBase
      * @param array $conditionalArray
      * @param array $fieldsArray
      */
-    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = false)
+    protected static function getCursor($conditionalArray = NULL
+    , $fieldsArray = NULL
+    , $one = false)
     {
 
         $calledClass = get_called_class();
@@ -602,7 +612,7 @@ class Mongo_ModelBase
     {
 
 
-        //static::$_collection = self::$_mongo->$collectionName;
+//static::$_collection = self::$_mongo->$collectionName;
         $command = array(
             'distinct' => static::$collectionName,
             'key'      => $key,
