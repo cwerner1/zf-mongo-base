@@ -7,28 +7,38 @@
 class Mongo_ModelBase
 {
 
-    public static $_accentStrings   = 'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
-    public static $_noAccentStrings = 'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
+    const EXCEPTION_CNAME_REMOVED =
+        "_collectionName has been removed, use collectioName instead";
+
+    private static $_accentStrings   =
+        'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
+    private static $_noAccentStrings =
+        'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
 
     /**
      * 
      * @var MongoDB 
      */
-    public static $_mongo = null;
+    private static $_mongo = null;
 
     /**
      *
      * @var MongoCollection  
      */
-    public static $_collection = null;
+    private static $_collection = null;
 
     /**
-     *
+     * collectionName
      * @var string 
      */
-    public static $_collectionName = null;
-    protected $id              = null;
-    protected $document        = null;
+    public static $collectionName = null;
+    protected $id             = null;
+    protected $_document      = null;
+
+    /**
+     * Database Indexes
+     */
+    public static $indexes = array();
 
     /**
      * hold Connections Options
@@ -64,6 +74,10 @@ class Mongo_ModelBase
     public function __construct($document = null)
     {
 
+        if (isset(static::$_collectionName)) {
+            throw new Exception(Mongo_ModelBase::EXCEPTION_CNAME_REMOVED);
+        }
+
         if (isset($document['_id'])) {
             $this->id = $document['_id'];
         }
@@ -72,7 +86,7 @@ class Mongo_ModelBase
                 $this->__set($key, $value);
             }
         } else {
-            $this->document = array();
+            $this->_document = array();
         }
     }
 
@@ -81,7 +95,16 @@ class Mongo_ModelBase
      */
     public function __toString()
     {
-        return ucfirst(static::$_collectionName) . "Object ID:" . $this->id;
+        return ucfirst(static::$collectionName) . "Object ID:" . $this->id;
+    }
+
+    /**
+     * returns the MongoDB Object
+     * @return MongoDB
+     */
+    public static function getMongo()
+    {
+        return self::$_mongo;
     }
 
     /**
@@ -99,9 +122,9 @@ class Mongo_ModelBase
 
 
         if (false !== strpos($name, '.')) {
-            return $this->_getDotNotation($name, $this->document);
+            return $this->_getDotNotation($name, $this->_document);
         }
-        return isset($this->document[$name]) ? $this->document[$name] : null;
+        return isset($this->_document[$name]) ? $this->_document[$name] : null;
     }
 
     /**
@@ -117,10 +140,10 @@ class Mongo_ModelBase
         }
         if ($withID === true) {
 
-            $arr = $arr + $this->document;
+            $arr = $arr + $this->_document;
         } else {
 
-            $return = $this->document;
+            $return = $this->_document;
             unset($return['id'], $return['_id']);
 
             return $return;
@@ -140,7 +163,7 @@ class Mongo_ModelBase
         }
         unset($document['_id']);
 
-        $this->document = $document;
+        $this->_document = $document;
 
         return $this;
     }
@@ -158,12 +181,12 @@ class Mongo_ModelBase
         }
 
         if (false !== strpos($name, '.')) {
-            return $this->_setDotNotation($name, $val, $this->document);
+            return $this->_setDotNotation($name, $val, $this->_document);
         }
         if ($val == null) {
-            unset($this->document[$name]);
+            unset($this->_document[$name]);
         }
-        $this->document[$name] = $val;
+        $this->_document[$name] = $val;
     }
 
     /**
@@ -173,7 +196,7 @@ class Mongo_ModelBase
      */
     public function __isset($name)
     {
-        return isset($this->document[$name]);
+        return isset($this->_document[$name]);
     }
 
     /**
@@ -182,7 +205,7 @@ class Mongo_ModelBase
      */
     public function __unset($name)
     {
-        unset($this->document[$name]);
+        unset($this->_document[$name]);
     }
 
     /**
@@ -226,8 +249,9 @@ class Mongo_ModelBase
                 $current[$field] = array();
             }
             $current = & $current[$field];
-            return
-                $this->_setDotNotation(substr($fields, $i + 1), $value, $current);
+
+            $shortField = substr($fields, $i + 1);
+            return $this->_setDotNotation($shortField, $value, $current);
         } else {
             $current[$fields] = $value;
         }
@@ -244,7 +268,7 @@ class Mongo_ModelBase
     {
         if ($this->id != null) {
 
-            static::$_collection->remove(array("_id" => $this->id));
+            self::$_collection->remove(array("_id" => $this->id));
             return true;
         }
         return false;
@@ -258,13 +282,13 @@ class Mongo_ModelBase
 
 
         if ($this->id == null) {
-            static::insert($this->document, true);
-            $this->id = $this->document['_id'];
-            unset($this->document['_id']);
+            static::insert($this->_document, true);
+            $this->id = $this->_document['_id'];
+            unset($this->_document['_id']);
             return true;
         } else {
 
-            return static::update(array("_id" => $this->id), $this->document);
+            return static::update(array("_id" => $this->id), $this->_document);
         }
     }
 
@@ -299,31 +323,9 @@ class Mongo_ModelBase
             $options = Zend_Registry::get('config')->mongodb;
         } elseif ($calledClass::$connectOptions != array()) {
 
-            $options = new stdClass();
-
-            if (isset(static::$connectOptions['username'])) {
-                $options->username = static::$connectOptions['username'];
-            }
-            if (isset(static::$connectOptions['password'])) {
-                $options->password = static::$connectOptions['password'];
-            }
-            if (isset(static::$connectOptions['hostname'])) {
-                $options->hostname = static::$connectOptions['hostname'];
-            }
-            if (isset(static::$connectOptions['port'])) {
-                $options->port = static::$connectOptions['port'];
-            }
-            if (isset(static::$connectOptions['databasename'])) {
-                $options->databasename
-                    = static::$connectOptions['databasename'];
-            }
+            $options = static::connectArrayToClass($calledClass::$connectOptions);
         } else {
-            $options  = new stdclass();
-            $options->username = 'test';
-            $options->password = 'test';
-            $options->hostname = 'localhost';
-            $options->port = '27017';
-            $options->databasename = 'MongoTestDatabase';
+            $options  = static::connectDefault();
         }
         $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
 
@@ -332,6 +334,45 @@ class Mongo_ModelBase
 
         $connection = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
+    }
+
+    public static function connectArrayToClass($connectOptions)
+    {
+        $options = new stdClass();
+
+        if (isset($connectOptions['username'])) {
+            $options->username = $connectOptions['username'];
+        }
+        if (isset($connectOptions['password'])) {
+            $options->password = $connectOptions['password'];
+        }
+        if (isset($connectOptions['hostname'])) {
+            $options->hostname = $connectOptions['hostname'];
+        }
+        if (isset($connectOptions['port'])) {
+            $options->port = $connectOptions['port'];
+        }
+        if (isset($connectOptions['databasename'])) {
+            $options->databasename
+                = $connectOptions['databasename'];
+        }
+        return $options;
+    }
+
+    /**
+     * Returns Default Connection Params
+     * @return \stdclass
+     */
+    public static function connectDefault()
+    {
+        $options               = new stdclass();
+        $options->username     = 'test';
+        $options->password     = 'test';
+        $options->hostname     = 'localhost';
+        $options->port         = '27017';
+        $options->databasename = 'MongoTestDatabase';
+
+        return $options;
     }
 
     public static function disconnect()
@@ -349,21 +390,21 @@ class Mongo_ModelBase
         if (self::$_mongo == null) {
             self::connect($calledClass);
         }
-        if (static::$_collectionName == null) {
+        if (static::$collectionName == null) {
             /*
              * Get collection name based on the class name. 
              * To do this, we take the class name and strip off the
              * beginning "Model_" and the rest is the collection name.
              */
 
-            $replaceableClassNameparts = array('model_');
-            static::$_collectionName =
-                str_replace($replaceableClassNameparts, '', strtolower(get_called_class()));
+            $rCN = array('model_'); // $replaceableClassNameparts
+            static::$collectionName =
+                str_replace($rCN, '', strtolower(get_called_class()));
         }
 
-        $collectionName = static::$_collectionName;
+        $collectionName = static::$collectionName;
 
-        static::$_collection = self::$_mongo->$collectionName;
+        self::$_collection = self::$_mongo->{$collectionName};
     }
 
     /**
@@ -391,10 +432,14 @@ class Mongo_ModelBase
 
     /**
      * Get one record
+     * sort param for compatibility to find
      */
-    public static function findOne($conditionalArray = null, $fieldsArray = null, $sort = null)
+// @codingStandardsIgnoreStart
+    public static function findOne($conditionalArray = null
+    , $fieldsArray = null
+    , $sort = null)
     {
-
+// @codingStandardsIgnoreEnd
 
         $className = get_called_class();
 
@@ -415,7 +460,12 @@ class Mongo_ModelBase
      * @param int $limit
      * @return this
      */
-    public static function find($conditionalArray = NULL, $fieldsArray = NULL, $sort = NULL, $limit = NULL, $skip = NULL)
+    public static function find(
+    $conditionalArray = NULL
+    , $fieldsArray = NULL
+    , $sort = NULL
+    , $limit = NULL
+    , $skip = NULL)
     {
         $className = get_called_class();
         $cursor    =
@@ -453,7 +503,9 @@ class Mongo_ModelBase
      * @param array $conditionalArray
      * @param array $fieldsArray
      */
-    protected static function getCursor($conditionalArray = NULL, $fieldsArray = NULL, $one = false)
+    protected static function getCursor($conditionalArray = NULL
+    , $fieldsArray = NULL
+    , $one = false)
     {
 
         $calledClass = get_called_class();
@@ -467,10 +519,10 @@ class Mongo_ModelBase
         }
         if ($one) {
             return
-                static::$_collection->findOne($conditionalArray, $fieldsArray);
+                self::$_collection->findOne($conditionalArray, $fieldsArray);
         }
 
-        $cursor = static::$_collection->find($conditionalArray, $fieldsArray);
+        $cursor = self::$_collection->find($conditionalArray, $fieldsArray);
         return $cursor;
     }
 
@@ -496,7 +548,7 @@ class Mongo_ModelBase
         if ($fsync) {
             $options['fsync'] = true;
         }
-        return static::$_collection->insert($data, $options);
+        return self::$_collection->insert($data, $options);
     }
 
     /**
@@ -508,7 +560,7 @@ class Mongo_ModelBase
 
         $calledClass = get_called_class();
         static::init($calledClass);
-        return static::$_collection->batchInsert($data);
+        return self::$_collection->batchInsert($data);
     }
 
     /**
@@ -522,7 +574,7 @@ class Mongo_ModelBase
     {
         $calledClass = get_called_class();
         static::init($calledClass);
-        return static::$_collection->update($criteria, $update, $options);
+        return self::$_collection->update($criteria, $update, $options);
     }
 
     /**
@@ -582,9 +634,9 @@ class Mongo_ModelBase
     {
 
 
-        //static::$_collection = self::$_mongo->$collectionName;
+//static::$_collection = self::$_mongo->$collectionName;
         $command = array(
-            'distinct' => static::$_collectionName,
+            'distinct' => static::$collectionName,
             'key'      => $key,
             'query'    => $query
         );
@@ -620,6 +672,20 @@ class Mongo_ModelBase
     public function getProfilingLevel()
     {
         return self::$_mongo->command(array('profile' => -1));
+    }
+
+    /**
+     * Setup Collection Index
+     * @return bool
+     */
+    public static function setUpIndexes()
+    {
+        return self::$_collection->ensureIndex(static::$indexes);
+    }
+
+    public static function getIndexInfo()
+    {
+        return self::$_collection->getIndexInfo();
     }
 
 }
