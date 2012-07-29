@@ -127,7 +127,8 @@ class Mongo_ModelBaseTest
         /**
          * ad
          */
-        $outputArr[] = "?]jklm[nñ][o?ÒÓÔÕÖØðòóôõöø]";
+        $outputArr[] = "?]jklm[nñ][o?ÒÓÔÕÖØ";
+        $outputArr[] = "ðòóôõöø]";
         $outputArr[] = "pqr[s?ß]t[uÙÚÛÜùúûü]";
         $outputArr[] = "vwx[y¥Ýýÿ][z?]";
 
