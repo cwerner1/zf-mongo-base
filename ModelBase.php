@@ -30,7 +30,7 @@ class Mongo_ModelBase
      */
     public static $collectionName = null;
     protected $id             = null;
-    protected $document       = null;
+    protected $_document       = null;
 
     /**
      * Database Indexes
@@ -83,7 +83,7 @@ class Mongo_ModelBase
                 $this->__set($key, $value);
             }
         } else {
-            $this->document = array();
+            $this->_document = array();
         }
     }
 
@@ -119,9 +119,9 @@ class Mongo_ModelBase
 
 
         if (false !== strpos($name, '.')) {
-            return $this->_getDotNotation($name, $this->document);
+            return $this->_getDotNotation($name, $this->_document);
         }
-        return isset($this->document[$name]) ? $this->document[$name] : null;
+        return isset($this->_document[$name]) ? $this->_document[$name] : null;
     }
 
     /**
@@ -137,10 +137,10 @@ class Mongo_ModelBase
         }
         if ($withID === true) {
 
-            $arr = $arr + $this->document;
+            $arr = $arr + $this->_document;
         } else {
 
-            $return = $this->document;
+            $return = $this->_document;
             unset($return['id'], $return['_id']);
 
             return $return;
@@ -160,7 +160,7 @@ class Mongo_ModelBase
         }
         unset($document['_id']);
 
-        $this->document = $document;
+        $this->_document = $document;
 
         return $this;
     }
@@ -178,12 +178,12 @@ class Mongo_ModelBase
         }
 
         if (false !== strpos($name, '.')) {
-            return $this->_setDotNotation($name, $val, $this->document);
+            return $this->_setDotNotation($name, $val, $this->_document);
         }
         if ($val == null) {
-            unset($this->document[$name]);
+            unset($this->_document[$name]);
         }
-        $this->document[$name] = $val;
+        $this->_document[$name] = $val;
     }
 
     /**
@@ -193,7 +193,7 @@ class Mongo_ModelBase
      */
     public function __isset($name)
     {
-        return isset($this->document[$name]);
+        return isset($this->_document[$name]);
     }
 
     /**
@@ -202,7 +202,7 @@ class Mongo_ModelBase
      */
     public function __unset($name)
     {
-        unset($this->document[$name]);
+        unset($this->_document[$name]);
     }
 
     /**
@@ -279,13 +279,13 @@ class Mongo_ModelBase
 
 
         if ($this->id == null) {
-            static::insert($this->document, true);
-            $this->id = $this->document['_id'];
-            unset($this->document['_id']);
+            static::insert($this->_document, true);
+            $this->id = $this->_document['_id'];
+            unset($this->_document['_id']);
             return true;
         } else {
 
-            return static::update(array("_id" => $this->id), $this->document);
+            return static::update(array("_id" => $this->id), $this->_document);
         }
     }
 
