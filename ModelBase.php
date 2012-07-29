@@ -10,9 +10,9 @@ class Mongo_ModelBase
     const EXCEPTION_CNAME_REMOVED =
         "_collectionName has been removed, use collectioName instead";
 
-    private static $_accentStrings   =
+    protected static $_accentStrings   =
         'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
-    private static $_noAccentStrings =
+    protected static $_noAccentStrings =
         'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
 
     /**
