@@ -412,6 +412,7 @@ class Mongo_ModelBase
 
     /**
      * Get one record
+     * sort param for compatibility to find
      */
     public static function findOne($conditionalArray = null
     , $fieldsArray = null
