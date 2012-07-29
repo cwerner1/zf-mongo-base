@@ -121,11 +121,14 @@ class Mongo_ModelBaseTest
 
     public function testAccent()
     {
-        $input  = "abcdefghijklmnopqrstuvwxyz";
-        $output =
-            "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jklm[nñ][o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]vwx[y¥Ýýÿ][z?]";
+        $input       = "abcdefghijklmnopqrstuvwxyz";
+        $outputArr[] = "[aÁÂÃÄÅÆàáâãäåæ]b[cç][d][eÉÊË?èéêë?]fgh[iÍÎÏ?ìíîï?]jkl";
+        $outputArr[] = "m[nñ][o?ÒÓÔÕÖØðòóôõöø]pqr[s?ß]t[uÙÚÛÜùúûü]";
+        $outputArr[] = "vwx[y¥Ýýÿ][z?]";
 
-        $mongo = new Mongo_ModelBase();
+
+        $output = implode('', $outputArr);
+        $mongo  = new Mongo_ModelBase();
 
         $this->assertEquals($output, $mongo->accentToRegex($input));
     }
