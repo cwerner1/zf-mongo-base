@@ -30,7 +30,7 @@ class Mongo_ModelBase
      */
     public static $collectionName = null;
     protected $id             = null;
-    protected $_document       = null;
+    protected $_document      = null;
 
     /**
      * Database Indexes
@@ -377,14 +377,14 @@ class Mongo_ModelBase
              * beginning "Model_" and the rest is the collection name.
              */
 
-            $replaceableClassNameparts = array('model_');
+            $rCN = array('model_'); // $replaceableClassNameparts
             static::$collectionName =
-                str_replace($replaceableClassNameparts, '', strtolower(get_called_class()));
+                str_replace($rCN, '', strtolower(get_called_class()));
         }
 
         $collectionName = static::$collectionName;
 
-        self::$_collection = self::$_mongo->$collectionName;
+        self::$_collection = self::$_mongo->{$collectionName};
     }
 
     /**
