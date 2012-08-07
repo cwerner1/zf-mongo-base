@@ -488,6 +488,10 @@ class Mongo_ModelBaseTest
 
         $this->assertNotEquals(NULL, TestMongoClass::getMongo());
         $this->assertEquals(TestMongoClass::getMongo(), TestMongoClass::connect('TestMongoClass'));
+
+        $array['_id'] = new MongoId();
+        $a            = new TestMongoClass($array);
+        $this->assertEquals('TestMongoClassObject ID:' . $array['_id'], $a->__toString());
     }
 
     public function testIndexes()
