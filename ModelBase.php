@@ -323,11 +323,13 @@ class Mongo_ModelBase
             $options = Zend_Registry::get('config')->mongodb;
         } elseif ($calledClass::$connectOptions != array()) {
 
-            $options = static::connectArrayToClass($calledClass::$connectOptions);
+            $options =
+                static::connectArrayToClass($calledClass::$connectOptions);
         } else {
             $options  = static::connectDefault();
         }
-        $mongoDns = sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
+        $mongoDns =
+            sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
 
         $mongoOptions = array("persist" => "x");
 
@@ -469,7 +471,7 @@ class Mongo_ModelBase
     {
         $className = get_called_class();
         $cursor    =
-            static::getCursor($conditionalArray, $fieldsArray, NULL, $className);
+            static::getCursor($conditionalArray, $fieldsArray,NULL, $className);
         if ($skip != NULL) {
             $cursor = $cursor->skip($skip);
         }
