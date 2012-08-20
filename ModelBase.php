@@ -471,7 +471,7 @@ class Mongo_ModelBase
     {
         $className = get_called_class();
         $cursor    =
-            static::getCursor($conditionalArray, $fieldsArray,NULL, $className);
+            static::getCursor($conditionalArray, $fieldsArray, NULL, $className);
         if ($skip != NULL) {
             $cursor = $cursor->skip($skip);
         }
