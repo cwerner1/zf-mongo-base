@@ -171,7 +171,8 @@ class Mongo_ModelBaseTest
 
     public function testDotNotation()
     {
-        $array = array('destdoc'         => get_called_class()
+        $array = array(
+            'destdoc'         => get_called_class()
         );
         $mongo            = new Mongo_ModelBase($array);
         $mongo->{'a.b.c'} = 'Dotnotation';
@@ -187,6 +188,29 @@ class Mongo_ModelBaseTest
         $method->setAccessible(TRUE);
 
         $this->assertNull($method->invoke(new Mongo_ModelBase, 'a.b.c', null));
+    }
+
+    public function testSetDotFieldEmpty()
+    {
+        $array = array(
+            'destdoc'         => get_called_class()
+        );
+        $mongo            = new Mongo_ModelBase($array);
+        $mongo->{'a.b.c'} = 'Dotnotation';
+        $array['a']       = array('b' => array('c' => 'Dotnotation'));
+
+        $this->assertEquals($array, $mongo->getDocument());
+
+        $this->assertEquals('Dotnotation', $mongo->{'a.b.c'});
+
+        $mongo->{'a.b.c'} = NULL;
+        $controlTwo       = array(
+            'destdoc' => get_called_class(),
+            'a'       => array(
+                'b' => array()
+            ),
+        );
+        $this->assertEquals($controlTwo, $mongo->getDocument());
     }
 
     public function testBatchInsert()

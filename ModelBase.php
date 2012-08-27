@@ -253,7 +253,11 @@ class Mongo_ModelBase
             $shortField = substr($fields, $i + 1);
             return $this->_setDotNotation($shortField, $value, $current);
         } else {
-            $current[$fields] = $value;
+            if ($value === NULL) {
+                unset($current[$fields]);
+            } else {
+                $current[$fields] = $value;
+            }
         }
     }
 
