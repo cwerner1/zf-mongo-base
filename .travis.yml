@@ -1,4 +1,4 @@
-language: php
+language: java
 php:
   -  5.3
   -  5.4
