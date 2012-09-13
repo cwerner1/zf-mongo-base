@@ -1,0 +1,6 @@
+language: php
+before_script:
+  - "ant phpunit"
+php:
+  -  5.3
+  -  5.4
