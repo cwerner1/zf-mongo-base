@@ -640,7 +640,7 @@ class Mongo_ModelBase
     {
 
 
-//static::$_collection = self::$_mongo->$collectionName;
+        //static::$_collection = self::$_mongo->$collectionName;
         $command = array(
             'distinct' => static::$collectionName,
             'key'      => $key,
@@ -654,7 +654,7 @@ class Mongo_ModelBase
      * This changes the current database profiling level.
      * Profiled queries will appear in the system.profile collection of 
      * this database.
-     * http://www.php.net/manual/de/mongodb.setprofilinglevel.php
+     * @see http://www.php.net/manual/de/mongodb.setprofilinglevel.php
      * 
      * @param int $level
      * <ul>
@@ -689,9 +689,24 @@ class Mongo_ModelBase
         return self::$_collection->ensureIndex(static::$indexes);
     }
 
+    /**
+     * Returns an Array of the Set Index
+     * @return array
+     */
     public static function getIndexInfo()
     {
         return self::$_collection->getIndexInfo();
+    }
+
+    /**
+     * return an Json String of the Document
+     * 
+     * @return Json 
+     */
+    public function toJson()
+    {
+
+        return json_encode($this->getDocument());
     }
 
 }

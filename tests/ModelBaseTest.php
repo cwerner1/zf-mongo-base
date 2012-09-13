@@ -554,6 +554,17 @@ class Mongo_ModelBaseTest
         $this->assertEquals('a_1', $indexsSecond[1]['name']);
     }
 
+    public function testToJson()
+    {
+
+
+        $obj                = new Mongo_ModelBase();
+        $obj->someField     = '1231';
+        $obj->iGotSomeField = array('aaZZ');
+        $control = '{"someField":"1231","iGotSomeField":["aaZZ"]}';
+        $this->assertEquals($control, $obj->toJson());
+    }
+
 }
 
 class TestMongoConstructThrowExcpectionClass
