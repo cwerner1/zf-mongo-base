@@ -1,9 +1,9 @@
 <phpdox xmlns="http://phpdox.de/config">
     <project name="Proj4" source="." workdir="build/phpdox">
         <collector publiconly="false">
-            <include mask="*.php" />
-            
-            <exclude mask="" />
+            <include mask="*.php"/>
+
+            <exclude mask=""/>
         </collector>
 
         <generator output="build">

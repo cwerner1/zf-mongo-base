@@ -2,7 +2,7 @@
 
 /**
  * Mongo Class to Connect to a Mongo Database
- * @package Mongo 
+ * @package Mongo
  */
 class Mongo_ModelBase
 {
@@ -10,30 +10,28 @@ class Mongo_ModelBase
     const EXCEPTION_CNAME_REMOVED =
         "_collectionName has been removed, use collectioName instead";
 
-    protected static $_accentStrings   =
+    protected static $_accentStrings =
         'ŠŒŽšœžŸ¥µÀÁÂÃÄÅÆÇÈÉÊËẼÌÍÎÏĨÐÑÒÓÔÕÖØÙÚÛÜÝßàáâãäåæçèéêëẽìíîïĩðñòóôõöøùúûüýÿ';
     protected static $_noAccentStrings =
         'SOZsozYYuAAAAAAACEEEEEIIIIIDNOOOOOOUUUUYsaaaaaaaceeeeeiiiiionoooooouuuuyy';
 
     /**
-     * 
-     * @var MongoDB 
+     * @var MongoDB
      */
     private static $_mongo = null;
 
     /**
-     *
-     * @var MongoCollection  
+     * @var MongoCollection
      */
     private static $_collection = null;
 
     /**
      * collectionName
-     * @var string 
+     * @var string
      */
     public static $collectionName = null;
-    protected $id             = null;
-    protected $_document      = null;
+    protected $id = null;
+    protected $_document = null;
 
     /**
      * Database Indexes
@@ -48,28 +46,25 @@ class Mongo_ModelBase
 
     /**
      * Contains all Variables and the short Mongo field
-     * us as key the long name you would like to use to access the field, as 
+     * us as key the long name you would like to use to access the field, as
      * value use the name of the key it will store the value
-     * 
-     * For example array('name' => 'n') 
-     * now you could use $object->name to acces the field n, and vice versa for 
+     * For example array('name' => 'n')
+     * now you could use $object->name to acces the field n, and vice versa for
      * saving
      * this would save space in the Database
      * be aware not to use duplicate Fields
-     * 
-     * 
      * @var array
      */
     public static $fieldnames = array();
 
     /**
-     * Magic methods 
+     * Magic methods
      */
 
     /**
      * Constructor puts full object in $document variable and assigns $id
      * @param $document
-     * 
+
      */
     public function __construct($document = null)
     {
@@ -124,18 +119,19 @@ class Mongo_ModelBase
         if (false !== strpos($name, '.')) {
             return $this->_getDotNotation($name, $this->_document);
         }
+
         return isset($this->_document[$name]) ? $this->_document[$name] : null;
     }
 
     /**
      * Returns Document with Id
-     * @param bool $withID	Returns Document with ID
+     * @param bool $withID    Returns Document with ID
      * @return array
      */
     public function getDocument($withID = true)
     {
         $arr = array();
-        if ($this->id !== NULL) {
+        if ($this->id !== null) {
             $arr = array('_id' => $this->id);
         }
         if ($withID === true) {
@@ -148,12 +144,13 @@ class Mongo_ModelBase
 
             return $return;
         }
+
         return $arr;
     }
 
     /**
      * Sets the Mongo Document without changing the ID
-     * @param array $document 
+     * @param array $document
      */
     public function setDocument($document = null)
     {
@@ -171,7 +168,7 @@ class Mongo_ModelBase
     /**
      * Set values like an object
      * @param string $name
-     * @param mixed $val
+     * @param mixed  $val
      */
     public function __set($name, $val)
     {
@@ -210,10 +207,9 @@ class Mongo_ModelBase
 
     /**
      * Allows use of the dot notation in the __get function
-     * Thanks to Ian White for this function: 
+     * Thanks to Ian White for this function:
      * https://github.com/ibwhite/simplemongophp
-     * 
-     * @param string $fields fields with dot notation
+     * @param string    $fields  fields with dot notation
      * @param reference $current The current part of the array working in
      */
     protected function _getDotNotation($fields, &$current)
@@ -225,6 +221,7 @@ class Mongo_ModelBase
                 return null;
             }
             $current = & $current[$field];
+
             return $this->_getDotNotation(substr($fields, $i + 1), $current);
         } else {
             return isset($current[$fields]) ? $current[$fields] : null;
@@ -235,9 +232,8 @@ class Mongo_ModelBase
      * Allows use of the not notation in __set function
      * Thanks to Ian White for this function:
      *  https://github.com/ibwhite/simplemongophp
-     * 
-     * @param string $fields
-     * @param mixed $value
+     * @param string    $fields
+     * @param mixed     $value
      * @param reference $current
      */
     protected function _setDotNotation($fields, $value, &$current)
@@ -251,9 +247,10 @@ class Mongo_ModelBase
             $current = & $current[$field];
 
             $shortField = substr($fields, $i + 1);
+
             return $this->_setDotNotation($shortField, $value, $current);
         } else {
-            if ($value === NULL) {
+            if ($value === null) {
                 unset($current[$fields]);
             } else {
                 $current[$fields] = $value;
@@ -273,8 +270,10 @@ class Mongo_ModelBase
         if ($this->id != null) {
 
             self::$_collection->remove(array("_id" => $this->id));
+
             return true;
         }
+
         return false;
     }
 
@@ -289,6 +288,7 @@ class Mongo_ModelBase
             static::insert($this->_document, true);
             $this->id = $this->_document['_id'];
             unset($this->_document['_id']);
+
             return true;
         } else {
 
@@ -300,7 +300,7 @@ class Mongo_ModelBase
      * Do special updates to the object (incrementing, etc...)
      * @param array $modifier
      * @param array $options
-     * @return type 
+     * @return type
      */
     public function specialUpdate($modifier, $options)
     {
@@ -314,7 +314,7 @@ class Mongo_ModelBase
     /**
      * Connect to mongo...
      * @param string $calledClass   Name of the Calling Class
-     * @return MongoDb 
+     * @return MongoDb
      */
     public static function connect($calledClass)
     {
@@ -323,14 +323,15 @@ class Mongo_ModelBase
         }
 
         if (class_exists('Zend_Registry', false)
-            && Zend_Registry::isRegistered('config')) {
+            && Zend_Registry::isRegistered('config')
+        ) {
             $options = Zend_Registry::get('config')->mongodb;
         } elseif ($calledClass::$connectOptions != array()) {
 
             $options =
                 static::connectArrayToClass($calledClass::$connectOptions);
         } else {
-            $options  = static::connectDefault();
+            $options = static::connectDefault();
         }
         $mongoDns =
             sprintf('mongodb://%s:%s@%s:%s/%s', $options->username, $options->password, $options->hostname, $options->port, $options->databasename);
@@ -338,7 +339,7 @@ class Mongo_ModelBase
         $mongoOptions = array("persist" => "x");
 
 
-        $connection = new Mongo($mongoDns, $mongoOptions);
+        $connection   = new Mongo($mongoDns, $mongoOptions);
         self::$_mongo = $connection->selectDB($options->databasename);
     }
 
@@ -362,6 +363,7 @@ class Mongo_ModelBase
             $options->databasename
                 = $connectOptions['databasename'];
         }
+
         return $options;
     }
 
@@ -403,7 +405,7 @@ class Mongo_ModelBase
              * beginning "Model_" and the rest is the collection name.
              */
 
-            $rCN = array('model_'); // $replaceableClassNameparts
+            $rCN                    = array('model_'); // $replaceableClassNameparts
             static::$collectionName =
                 str_replace($rCN, '', strtolower(get_called_class()));
         }
@@ -442,8 +444,8 @@ class Mongo_ModelBase
      */
 // @codingStandardsIgnoreStart
     public static function findOne($conditionalArray = null
-    , $fieldsArray = null
-    , $sort = null)
+        , $fieldsArray = null
+        , $sort = null)
     {
 // @codingStandardsIgnoreEnd
 
@@ -455,34 +457,36 @@ class Mongo_ModelBase
             return null;
         }
         $object = new $className($document);
+
         return $object;
     }
 
     /**
      * Query the database for documents in the collection
-     * @param array $conditionalArray 
-     * @param array $fieldsArray 
+     * @param array $conditionalArray
+     * @param array $fieldsArray
      * @param array $sort
-     * @param int $limit
+     * @param int   $limit
      * @return this
      */
     public static function find(
-    $conditionalArray = NULL
-    , $fieldsArray = NULL
-    , $sort = NULL
-    , $limit = NULL
-    , $skip = NULL)
+        $conditionalArray = null
+        , $fieldsArray = null
+        , $sort = null
+        , $limit = null
+        , $skip = null)
     {
-        $className = get_called_class();
-        $cursor    =
-            static::getCursor($conditionalArray, $fieldsArray, NULL, $className);
-        if ($skip != NULL) {
+        $className            = get_called_class();
+        $cursor               =
+            static::getCursor($conditionalArray, $fieldsArray, null, $className);
+        static::$getLastCount = $cursor->count();
+        if ($skip != null) {
             $cursor = $cursor->skip($skip);
         }
-        if ($limit != NULL) {
+        if ($limit != null) {
             $cursor = $cursor->limit($limit);
         }
-        if ($sort != NULL) {
+        if ($sort != null) {
             $cursor = $cursor->sort($sort);
         }
 
@@ -490,10 +494,13 @@ class Mongo_ModelBase
         foreach ($cursor as $document) {
             $objectArray[] = new $className($document);
         }
+
         return $objectArray;
     }
 
-    /*     * va
+    public static $getLastCount = 0;
+
+    /*
      * Count by query array
      * @param array $conditionalArray
      */
@@ -501,6 +508,7 @@ class Mongo_ModelBase
     public static function count($conditionalArray = null)
     {
         $cursor = static::getCursor($conditionalArray);
+
         return $cursor->count();
     }
 
@@ -509,18 +517,18 @@ class Mongo_ModelBase
      * @param array $conditionalArray
      * @param array $fieldsArray
      */
-    protected static function getCursor($conditionalArray = NULL
-    , $fieldsArray = NULL
-    , $one = false)
+    protected static function getCursor($conditionalArray = null
+        , $fieldsArray = null
+        , $one = false)
     {
 
         $calledClass = get_called_class();
 
         static::init($calledClass);
-        if ($conditionalArray == NULL) {
+        if ($conditionalArray == null) {
             $conditionalArray = array();
         }
-        if ($fieldsArray == NULL) {
+        if ($fieldsArray == null) {
             $fieldsArray = array();
         }
         if ($one) {
@@ -529,16 +537,16 @@ class Mongo_ModelBase
         }
 
         $cursor = self::$_collection->find($conditionalArray, $fieldsArray);
+
         return $cursor;
     }
 
     /**
-     * 
      * Enter description here ...
      * @param array $data
-     * @param bool $safe // Set true if you want to wait 
-     * for database response...
-     * @param bool $fsync
+     * @param bool  $safe // Set true if you want to wait
+     *                    for database response...
+     * @param bool  $fsync
      */
     public static function insert($data, $safe = false, $fsync = false)
     {
@@ -554,6 +562,7 @@ class Mongo_ModelBase
         if ($fsync) {
             $options['fsync'] = true;
         }
+
         return self::$_collection->insert($data, $options);
     }
 
@@ -566,6 +575,7 @@ class Mongo_ModelBase
 
         $calledClass = get_called_class();
         static::init($calledClass);
+
         return self::$_collection->batchInsert($data);
     }
 
@@ -574,27 +584,24 @@ class Mongo_ModelBase
      * @param array $criteria
      * @param array $update
      * @param array $options
-     * @return type 
+     * @return type
      */
     public static function update($criteria, $update, $options = array())
     {
         $calledClass = get_called_class();
         static::init($calledClass);
+
         return self::$_collection->update($criteria, $update, $options);
     }
 
     /**
-
      * Returns a string with accent to REGEX expression to find any combinations
      * in accent insentive way
-     *
      * @param string $text The text.
      * @return string The REGEX text.
      */
     public static function accentToRegex($text)
     {
-
-
 
 
         $from = str_split(utf8_decode(static::$_accentStrings));
@@ -630,13 +637,12 @@ class Mongo_ModelBase
     }
 
     /**
-     * Finding all of the distinct values for a key.    
-     * 
+     * Finding all of the distinct values for a key.
      * @param string $key
-     * @param array $query
-     * @return $self 
+     * @param array  $query
+     * @return $self
      */
-    public static function distinct($key = NULL, $query = NULL)
+    public static function distinct($key = null, $query = null)
     {
 
 
@@ -652,10 +658,9 @@ class Mongo_ModelBase
 
     /**
      * This changes the current database profiling level.
-     * Profiled queries will appear in the system.profile collection of 
+     * Profiled queries will appear in the system.profile collection of
      * this database.
      * @see http://www.php.net/manual/de/mongodb.setprofilinglevel.php
-     * 
      * @param int $level
      * <ul>
      * <li>0 off</li>
@@ -663,7 +668,7 @@ class Mongo_ModelBase
      * <li>2 all queries</li>
      * </ul>
      * @param int $slowms
-     * @return type 
+     * @return type
      */
     public function setProfilingLevel($level, $slowms = null)
     {
@@ -672,6 +677,7 @@ class Mongo_ModelBase
             'profile' => $level,
             'slowms'  => $slowms
         );
+
         return self::$_mongo->command($command);
     }
 
@@ -699,14 +705,23 @@ class Mongo_ModelBase
     }
 
     /**
+     * Returns the  Document
+     * return array
+     */
+    public function toJsonArr()
+    {
+
+        return $this->getDocument();
+    }
+
+    /**
      * return an Json String of the Document
-     * 
-     * @return Json 
+     * @return Json
      */
     public function toJson()
     {
 
-        return json_encode($this->getDocument());
+        return json_encode($this->toJsonArr());
     }
 
 }

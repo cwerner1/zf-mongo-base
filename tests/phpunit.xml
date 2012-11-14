@@ -1,14 +1,13 @@
-
 <phpunit bootstrap="./bootstrap.php" codecoverage="true">
     <testsuite name="Application Test Suite">
         <directory>./</directory>
     </testsuite>
-  
+
     <filter>
         <whitelist>
             <directory suffix=".php">../</directory>
         </whitelist>
-       
+
     </filter>
 
     <logging>
@@ -21,6 +20,6 @@
 
     </logging>
     <php>
-        <ini name="memory_limit" value="-1" />
+        <ini name="memory_limit" value="-1"/>
     </php>
 </phpunit>
